@@ -3,7 +3,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <title>TAS LIVE</title>
 
 <style>
@@ -11,19 +12,32 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  width: 100%;
+  min-height: 100%;
   background: black;
   color: white;
   font-family: Arial, sans-serif;
   text-align: center;
 }
 
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
 /* MAIN SCREEN */
 #home {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 12px 20px 30px;
+  width: 100%;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(90px, calc(30px + env(safe-area-inset-bottom)))
+    max(16px, env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,24 +45,26 @@ body {
 }
 
 #picsButton {
-  margin-bottom: 35px;
+  margin-bottom: clamp(20px, 4vh, 35px);
   padding: 12px 38px;
   background: transparent;
   border: 2px solid white;
   color: white;
   border-radius: 10px;
-  font-size: 25px;
+  font-size: clamp(18px, 2.5vw, 25px);
   font-weight: bold;
+  cursor: pointer;
 }
 
 h1 {
-  font-size: clamp(55px, 12vw, 130px);
-  letter-spacing: 8px;
+  font-size: clamp(42px, 12vw, 130px);
+  letter-spacing: clamp(2px, 1vw, 8px);
   margin: 0 0 20px;
+  overflow-wrap: anywhere;
 }
 
 #status {
-  font-size: clamp(32px, 7vw, 65px);
+  font-size: clamp(30px, 7vw, 65px);
   font-weight: bold;
   margin: 20px 0;
 }
@@ -63,41 +79,44 @@ h1 {
 
 p {
   color: #ccc;
-  font-size: clamp(18px, 3vw, 26px);
+  font-size: clamp(16px, 3vw, 26px);
+  max-width: 90vw;
+  overflow-wrap: anywhere;
 }
 
-a {
+#watchButton {
   display: inline-block;
   margin-top: 20px;
-  padding: 22px 30px;
+  padding: clamp(15px, 3vw, 22px) clamp(20px, 4vw, 30px);
   background: #fe2c55;
   color: white;
   text-decoration: none;
-  font-size: clamp(20px, 4vw, 36px);
+  font-size: clamp(18px, 4vw, 36px);
   font-weight: bold;
   border-radius: 12px;
+  max-width: 95%;
 }
 
-/* PICTURES SCREEN */
+/* GALLERY */
 #gallery {
   display: none;
   height: 100vh;
   height: 100dvh;
   width: 100%;
   overflow: hidden;
-  position: relative;
+  position: fixed;
+  inset: 0;
   background: black;
 }
 
-/* THREE PICTURES SIDE BY SIDE */
 #photoGrid {
   height: 100%;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: 1fr;
-  gap: 0;
-  padding: 0;
+  gap: 2px;
+  background: black;
 }
 
 #photoGrid img {
@@ -110,18 +129,18 @@ a {
   background: black;
 }
 
-/* BACK BUTTON */
 #closeGallery {
   position: absolute;
   z-index: 2;
-  top: 10px;
-  left: 10px;
+  top: max(10px, env(safe-area-inset-top));
+  left: max(10px, env(safe-area-inset-left));
   padding: 10px 16px;
   background: rgba(0,0,0,.75);
   border: 1px solid white;
   border-radius: 8px;
   color: white;
   font-size: 16px;
+  cursor: pointer;
 }
 
 #galleryMessage {
@@ -131,6 +150,108 @@ a {
   width: 100%;
   color: white;
   pointer-events: none;
+}
+
+/* LOCK BUTTON */
+#lockButton {
+  position: fixed;
+  z-index: 20;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  width: clamp(58px, 8vw, 72px);
+  height: clamp(58px, 8vw, 72px);
+  border: none;
+  border-radius: 50%;
+  background: red;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(255,0,0,.5);
+}
+
+#lockButton:disabled {
+  opacity: .5;
+  cursor: wait;
+}
+
+/* SMALL SCREENS */
+@media (max-width: 600px) {
+  #home {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  h1 {
+    letter-spacing: 3px;
+  }
+
+  #photoGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #closeGallery {
+    font-size: 14px;
+    padding: 9px 12px;
+  }
+}
+
+/* LANDSCAPE PHONES AND TABLETS */
+@media (max-height: 500px) and (orientation: landscape) {
+  #home {
+    padding-top: 8px;
+    padding-bottom: 80px;
+  }
+
+  #picsButton {
+    margin-bottom: 8px;
+    padding: 7px 25px;
+  }
+
+  h1 {
+    font-size: clamp(35px, 9vh, 75px);
+    margin-bottom: 5px;
+  }
+
+  #status {
+    font-size: clamp(25px, 8vh, 45px);
+    margin: 8px 0;
+  }
+
+  p {
+    margin: 6px;
+    font-size: clamp(14px, 3vh, 19px);
+  }
+
+  #watchButton {
+    margin-top: 8px;
+    padding: 10px 18px;
+    font-size: 18px;
+  }
+}
+
+/* LARGE PROJECTORS AND TV SCREENS */
+@media (min-width: 1400px) {
+  #home {
+    padding: 40px;
+  }
+
+  #picsButton {
+    font-size: 30px;
+    padding: 16px 48px;
+  }
+
+  h1 {
+    font-size: clamp(110px, 12vw, 180px);
+  }
+
+  #status {
+    font-size: clamp(65px, 7vw, 95px);
+  }
+
+  p {
+    font-size: clamp(25px, 2vw, 34px);
+  }
 }
 </style>
 </head>
@@ -148,7 +269,8 @@ a {
 
   <p id="lastEnded"></p>
 
-  <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
+  <a id="watchButton"
+     href="https://www.tiktok.com/@tasosanastasios">
     VISIT TAS CHANNEL
   </a>
 </main>
@@ -161,6 +283,10 @@ a {
   <p id="galleryMessage">Loading photos...</p>
 </section>
 
+<button id="lockButton" onclick="activateLock()" disabled>
+  LOCK
+</button>
+
 <script>
 const liveLink =
   "https://www.tiktok.com/@tasosanastasios/live";
@@ -168,6 +294,68 @@ const liveLink =
 const channelLink =
   "https://www.tiktok.com/@tasosanastasios";
 
+const youtubeDestination =
+  "https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO";
+
+const picsURL =
+  "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics";
+
+let banReady = false;
+
+/* CHECK BAN */
+async function checkBan() {
+  const button = document.getElementById("lockButton");
+
+  try {
+    const response = await fetch("/api/ban", {
+      method: "GET",
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error();
+
+    const data = await response.json();
+
+    if (data.banned) {
+      window.location.replace(youtubeDestination);
+      return false;
+    }
+
+    banReady = true;
+    button.disabled = false;
+    return true;
+
+  } catch (error) {
+    banReady = false;
+    button.disabled = true;
+    return true;
+  }
+}
+
+/* ACTIVATE BAN */
+async function activateLock() {
+  if (!banReady) return;
+
+  const button = document.getElementById("lockButton");
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/ban", {
+      method: "POST",
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error();
+
+    window.location.replace(youtubeDestination);
+
+  } catch (error) {
+    button.disabled = false;
+    alert("Could not activate the ban. Please try again.");
+  }
+}
+
+/* CHECK TIKTOK STATUS */
 async function checkStatus() {
   const status = document.getElementById("status");
   const message = document.getElementById("message");
@@ -191,6 +379,7 @@ async function checkStatus() {
       button.textContent = "WATCH TAS LIVE";
       button.href = liveLink;
       lastEnded.textContent = "";
+
     } else {
       status.textContent = "● OFFLINE";
       status.className = "offline";
@@ -203,6 +392,7 @@ async function checkStatus() {
           new Date(data.last_stream_ended).toLocaleString()
         : "LAST STREAM ENDED: NOT AVAILABLE YET";
     }
+
   } catch (error) {
     status.textContent = "STATUS UNAVAILABLE";
     status.className = "";
@@ -210,6 +400,7 @@ async function checkStatus() {
   }
 }
 
+/* OPEN GALLERY */
 async function openGallery() {
   document.getElementById("home").style.display = "none";
   document.getElementById("gallery").style.display = "block";
@@ -221,16 +412,17 @@ async function openGallery() {
   message.textContent = "Loading photos...";
 
   try {
-    const response = await fetch(
-      "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics"
-    );
+    const response = await fetch(picsURL);
 
     if (!response.ok) throw new Error();
 
     const files = await response.json();
 
     const photos = files
-      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name))
+      .filter(file =>
+        file.type === "file" &&
+        /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+      )
       .sort((a, b) => a.name.localeCompare(b.name))
       .slice(0, 3);
 
@@ -247,18 +439,30 @@ async function openGallery() {
     });
 
     message.textContent = "";
+
   } catch (error) {
     message.textContent = "Could not load photos.";
   }
 }
 
+/* CLOSE GALLERY */
 function closeGallery() {
   document.getElementById("gallery").style.display = "none";
   document.getElementById("home").style.display = "flex";
 }
 
-checkStatus();
-setInterval(checkStatus, 300000);
+/* START */
+async function startWebsite() {
+  const allowed = await checkBan();
+
+  if (!allowed) return;
+
+  await checkStatus();
+
+  setInterval(checkStatus, 300000);
+}
+
+startWebsite();
 </script>
 
 </body>
