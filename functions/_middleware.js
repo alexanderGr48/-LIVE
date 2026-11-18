@@ -1,9 +1,9 @@
-
 export async function onRequest(context) {
   const { request, env, next } = context;
+  const pathname = new URL(request.url).pathname;
 
-  // Allow the ban API to process lock requests.
-  if (new URL(request.url).pathname === "/api/ban") {
+  // Allow the ban API and blocked page to load.
+  if (pathname === "/api/ban" || pathname === "/blocked.html") {
     return next();
   }
 
@@ -15,12 +15,10 @@ export async function onRequest(context) {
     const banned = await env.TAS_BANS.get("ban:" + visitor);
 
     if (banned) {
-      return new Response(null, {
-        status: 403,
-        headers: {
-          "Cache-Control": "no-store"
-        }
-      });
+      return Response.redirect(
+        new URL("/blocked.html", request.url),
+        302
+      );
     }
   }
 
