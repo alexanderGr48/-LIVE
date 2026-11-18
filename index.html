@@ -4,10 +4,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
 <title>TAS LIVE</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
@@ -19,9 +22,11 @@ html, body {
   text-align: center;
 }
 
-body { overflow: hidden; }
+body {
+  overflow: hidden;
+}
 
-/* HOME */
+/* HOME SCREEN */
 #home {
   width: 100%;
   height: 100vh;
@@ -57,15 +62,20 @@ h1 {
   margin: 20px 0;
 }
 
-.live { color: #20e879; }
-.offline { color: #ff4545; }
+.live {
+  color: #20e879;
+}
+
+.offline {
+  color: #ff4545;
+}
 
 p {
   color: #ccc;
   font-size: clamp(18px, 3vw, 26px);
 }
 
-a {
+#watchButton {
   display: inline-block;
   margin-top: 20px;
   padding: 22px 30px;
@@ -77,7 +87,7 @@ a {
   border-radius: 12px;
 }
 
-/* GALLERY */
+/* FULL SCREEN GALLERY */
 #gallery {
   display: none;
   position: fixed;
@@ -100,13 +110,20 @@ a {
   background: black;
 }
 
-#photoGrid img {
+#photoGrid img,
+#photoGrid .redPanel {
   display: block;
   width: 100%;
   height: 100%;
   min-width: 0;
   min-height: 0;
   object-fit: cover;
+}
+
+#photoGrid .redPanel {
+  background:
+    radial-gradient(ellipse at 50% 50%, #ff1717 0%, #9c0000 24%, transparent 65%),
+    linear-gradient(135deg, #000000, #260000, #000000);
 }
 
 #closeGallery {
@@ -133,10 +150,10 @@ a {
   pointer-events: none;
 }
 
-/* FLOATING RED LOCK BUTTON */
+/* FLOATING LOCK BUTTON */
 #lockButton {
   position: fixed;
-  z-index: 25;
+  z-index: 100;
   right: 18px;
   bottom: 18px;
   padding: 15px 22px;
@@ -149,31 +166,8 @@ a {
   cursor: pointer;
 }
 
-/* LOCK SCREEN */
-#lockScreen {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  color: white;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 20px;
-}
-
-#lockScreen h2 {
-  color: red;
-  font-size: clamp(35px, 8vw, 75px);
-}
-
-#countdown {
-  font-size: clamp(35px, 8vw, 70px);
-  font-weight: bold;
-  letter-spacing: 3px;
+#lockButton:disabled {
+  opacity: 0.6;
 }
 </style>
 </head>
@@ -186,7 +180,9 @@ a {
   <h1>TAS LIVE</h1>
 
   <div id="status">CHECKING...</div>
+
   <p id="message">Checking TikTok status...</p>
+
   <p id="lastEnded"></p>
 
   <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
@@ -200,22 +196,77 @@ a {
   <p id="galleryMessage">Loading photos...</p>
 </section>
 
-<button id="lockButton" onclick="activateLock()">🔒 LOCK</button>
-
-<section id="lockScreen">
-  <h2>🔒 TAS LOCKED</h2>
-  <p>THIS WEBSITE IS TEMPORARILY LOCKED</p>
-  <p>TIME REMAINING</p>
-  <div id="countdown">18:00:00</div>
-</section>
+<button id="lockButton" onclick="activateLock()">
+  🔒 LOCK
+</button>
 
 <script>
-const liveLink = "https://www.tiktok.com/@tasosanastasios/live";
-const channelLink = "https://www.tiktok.com/@tasosanastasios";
+const liveLink =
+  "https://www.tiktok.com/@tasosanastasios/live";
 
-const LOCK_DURATION = 18 * 60 * 60 * 1000;
-const LOCK_KEY = "tas_site_lock_until";
+const channelLink =
+  "https://www.tiktok.com/@tasosanastasios";
 
+let banReady = false;
+
+/* CHECK VISITOR BAN STATUS */
+async function checkBan() {
+  try {
+    const response = await fetch("/api/ban", {
+      method: "GET",
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not check ban");
+    }
+
+    const data = await response.json();
+
+    if (data.banned) {
+      document.documentElement.innerHTML = "";
+      return false;
+    }
+
+    banReady = true;
+    return true;
+
+  } catch (error) {
+    document.getElementById("lockButton").disabled = true;
+    document.getElementById("message").textContent =
+      "Could not verify website access. Please try again.";
+
+    return false;
+  }
+}
+
+/* ACTIVATE PERSONAL 45-MINUTE BAN */
+async function activateLock() {
+  if (!banReady) return;
+
+  const button = document.getElementById("lockButton");
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/ban", {
+      method: "POST",
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Ban failed");
+    }
+
+    // Navigate to a page blocked by the middleware.
+    window.location.replace("/");
+
+  } catch (error) {
+    button.disabled = false;
+    alert("Could not activate the ban. Please try again.");
+  }
+}
+
+/* CHECK TIKTOK STATUS */
 async function checkStatus() {
   const status = document.getElementById("status");
   const message = document.getElementById("message");
@@ -239,6 +290,7 @@ async function checkStatus() {
       button.textContent = "WATCH TAS LIVE";
       button.href = liveLink;
       lastEnded.textContent = "";
+
     } else {
       status.textContent = "● OFFLINE";
       status.className = "offline";
@@ -251,6 +303,7 @@ async function checkStatus() {
           new Date(data.last_stream_ended).toLocaleString()
         : "LAST STREAM ENDED: NOT AVAILABLE YET";
     }
+
   } catch (error) {
     status.textContent = "STATUS UNAVAILABLE";
     status.className = "";
@@ -258,6 +311,7 @@ async function checkStatus() {
   }
 }
 
+/* OPEN GALLERY */
 async function openGallery() {
   document.getElementById("home").style.display = "none";
   document.getElementById("gallery").style.display = "block";
@@ -280,78 +334,52 @@ async function openGallery() {
     const photos = files
       .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name))
       .sort((a, b) => a.name.localeCompare(b.name))
-      .slice(0, 3);
+      .slice(0, 2);
 
     if (photos.length === 0) {
       message.textContent = "No photos uploaded yet.";
-      return;
+    } else {
+      photos.forEach(file => {
+        const img = document.createElement("img");
+        img.src = file.download_url;
+        img.alt = "TAS photo";
+        grid.appendChild(img);
+      });
+
+      message.textContent = "";
     }
 
-    photos.forEach(file => {
-      const img = document.createElement("img");
-      img.src = file.download_url;
-      img.alt = "TAS photo";
-      grid.appendChild(img);
-    });
+    // Third panel: black and red.
+    const redPanel = document.createElement("div");
+    redPanel.className = "redPanel";
+    grid.appendChild(redPanel);
 
-    message.textContent = "";
   } catch (error) {
     message.textContent = "Could not load photos.";
+
+    const redPanel = document.createElement("div");
+    redPanel.className = "redPanel";
+    grid.appendChild(redPanel);
   }
 }
 
+/* CLOSE GALLERY */
 function closeGallery() {
   document.getElementById("gallery").style.display = "none";
   document.getElementById("home").style.display = "flex";
 }
 
-/* 18-HOUR LOCK SYSTEM */
-function activateLock() {
-  const confirmed = confirm(
-    "Are you sure? This website will be locked for 18 hours."
-  );
+/* START WEBSITE */
+async function startWebsite() {
+  const allowed = await checkBan();
 
-  if (!confirmed) return;
+  if (!allowed) return;
 
-  const unlockTime = Date.now() + LOCK_DURATION;
-
-  localStorage.setItem(LOCK_KEY, String(unlockTime));
-
-  updateLock();
+  checkStatus();
+  setInterval(checkStatus, 300000);
 }
 
-function updateLock() {
-  const savedTime = Number(localStorage.getItem(LOCK_KEY) || 0);
-  const screen = document.getElementById("lockScreen");
-  const button = document.getElementById("lockButton");
-
-  if (savedTime > Date.now()) {
-    screen.style.display = "flex";
-    button.style.display = "none";
-
-    const remaining = savedTime - Date.now();
-
-    const hours = Math.floor(remaining / 3600000);
-    const minutes = Math.floor((remaining % 3600000) / 60000);
-    const seconds = Math.floor((remaining % 60000) / 1000);
-
-    document.getElementById("countdown").textContent =
-      String(hours).padStart(2, "0") + ":" +
-      String(minutes).padStart(2, "0") + ":" +
-      String(seconds).padStart(2, "0");
-
-  } else {
-    localStorage.removeItem(LOCK_KEY);
-    screen.style.display = "none";
-    button.style.display = "block";
-  }
-}
-
-checkStatus();
-updateLock();
-
-setInterval(checkStatus, 300000);
-setInterval(updateLock, 1000);
+startWebsite();
 </script>
 
 </body>
