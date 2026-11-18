@@ -13,13 +13,13 @@
 
 body {
   margin: 0;
-  background: #000;
+  background: black;
   color: white;
   font-family: Arial, sans-serif;
   text-align: center;
 }
 
-/* HOME PAGE */
+/* MAIN SCREEN */
 #home {
   min-height: 100vh;
   min-height: 100dvh;
@@ -31,7 +31,7 @@ body {
 }
 
 #picsButton {
-  margin-bottom: 12px;
+  margin-bottom: 35px;
   padding: 12px 38px;
   background: transparent;
   border: 2px solid white;
@@ -39,7 +39,6 @@ body {
   border-radius: 10px;
   font-size: 25px;
   font-weight: bold;
-  cursor: pointer;
 }
 
 h1 {
@@ -67,7 +66,7 @@ p {
   font-size: clamp(18px, 3vw, 26px);
 }
 
-#watchButton {
+a {
   display: inline-block;
   margin-top: 20px;
   padding: 22px 30px;
@@ -79,7 +78,7 @@ p {
   border-radius: 12px;
 }
 
-/* PICS GALLERY */
+/* PICTURES SCREEN */
 #gallery {
   display: none;
   height: 100vh;
@@ -90,7 +89,7 @@ p {
   background: black;
 }
 
-/* THREE PHOTOS SIDE BY SIDE */
+/* THREE PICTURES SIDE BY SIDE */
 #photoGrid {
   height: 100%;
   width: 100%;
@@ -98,16 +97,20 @@ p {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: 1fr;
   gap: 0;
+  padding: 0;
 }
 
 #photoGrid img {
   width: 100%;
   height: 100%;
   min-width: 0;
-  object-fit: cover;
+  min-height: 0;
+  object-fit: contain;
   display: block;
+  background: black;
 }
 
+/* BACK BUTTON */
 #closeGallery {
   position: absolute;
   z-index: 2;
@@ -119,7 +122,6 @@ p {
   border-radius: 8px;
   color: white;
   font-size: 16px;
-  cursor: pointer;
 }
 
 #galleryMessage {
@@ -127,7 +129,6 @@ p {
   top: 50%;
   left: 0;
   width: 100%;
-  margin: 0;
   color: white;
   pointer-events: none;
 }
@@ -136,12 +137,8 @@ p {
 
 <body>
 
-<!-- HOME PAGE -->
 <main id="home">
-
-  <button id="picsButton" onclick="openGallery()">
-    PICS
-  </button>
+  <button id="picsButton" onclick="openGallery()">PICS</button>
 
   <h1>TAS LIVE</h1>
 
@@ -151,28 +148,17 @@ p {
 
   <p id="lastEnded"></p>
 
-  <a
-    id="watchButton"
-    href="https://www.tiktok.com/@tasosanastasios"
-    target="_blank"
-    rel="noopener"
-  >
+  <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
     VISIT TAS CHANNEL
   </a>
-
 </main>
 
-<!-- PHOTO GALLERY -->
 <section id="gallery">
-
-  <button id="closeGallery" onclick="closeGallery()">
-    ← BACK
-  </button>
+  <button id="closeGallery" onclick="closeGallery()">← BACK</button>
 
   <div id="photoGrid"></div>
 
   <p id="galleryMessage">Loading photos...</p>
-
 </section>
 
 <script>
@@ -182,47 +168,33 @@ const liveLink =
 const channelLink =
   "https://www.tiktok.com/@tasosanastasios";
 
-
-/* CHECK TIKTOK STATUS */
 async function checkStatus() {
-
   const status = document.getElementById("status");
   const message = document.getElementById("message");
   const lastEnded = document.getElementById("lastEnded");
   const button = document.getElementById("watchButton");
 
   try {
-
     const response = await fetch(
       "/status.json?t=" + Date.now(),
       { cache: "no-store" }
     );
 
-    if (!response.ok) {
-      throw new Error("Status unavailable");
-    }
+    if (!response.ok) throw new Error();
 
     const data = await response.json();
 
     if (data.live === true) {
-
       status.textContent = "● LIVE NOW";
       status.className = "live";
-
       message.textContent = "TAS IS LIVE ON TIKTOK!";
-
       button.textContent = "WATCH TAS LIVE";
       button.href = liveLink;
-
       lastEnded.textContent = "";
-
     } else {
-
       status.textContent = "● OFFLINE";
       status.className = "offline";
-
       message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
-
       button.textContent = "VISIT TAS CHANNEL";
       button.href = channelLink;
 
@@ -230,104 +202,63 @@ async function checkStatus() {
         ? "LAST STREAM ENDED: " +
           new Date(data.last_stream_ended).toLocaleString()
         : "LAST STREAM ENDED: NOT AVAILABLE YET";
-
     }
-
   } catch (error) {
-
     status.textContent = "STATUS UNAVAILABLE";
     status.className = "";
-
-    message.textContent =
-      "Could not check TikTok status.";
-
-    lastEnded.textContent = "";
-
+    message.textContent = "Could not check TikTok status.";
   }
 }
 
-
-/* OPEN PICS GALLERY */
 async function openGallery() {
-
   document.getElementById("home").style.display = "none";
-
   document.getElementById("gallery").style.display = "block";
 
   const grid = document.getElementById("photoGrid");
   const message = document.getElementById("galleryMessage");
 
   grid.innerHTML = "";
-
   message.textContent = "Loading photos...";
 
   try {
-
     const response = await fetch(
       "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics"
     );
 
-    if (!response.ok) {
-      throw new Error("Could not load photos");
-    }
+    if (!response.ok) throw new Error();
 
     const files = await response.json();
 
     const photos = files
-      .filter(file =>
-        /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
-      )
-      .sort((a, b) =>
-        a.name.localeCompare(b.name)
-      )
+      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name))
+      .sort((a, b) => a.name.localeCompare(b.name))
       .slice(0, 3);
 
     if (photos.length === 0) {
-
       message.textContent = "No photos uploaded yet.";
-
       return;
-
     }
 
     photos.forEach(file => {
-
       const img = document.createElement("img");
-
       img.src = file.download_url;
-
       img.alt = "TAS photo";
-
       grid.appendChild(img);
-
     });
 
     message.textContent = "";
-
   } catch (error) {
-
     message.textContent = "Could not load photos.";
-
   }
-
 }
 
-
-/* CLOSE GALLERY */
 function closeGallery() {
-
   document.getElementById("gallery").style.display = "none";
-
   document.getElementById("home").style.display = "flex";
-
 }
 
-
-/* CHECK NOW AND EVERY 5 MINUTES */
 checkStatus();
-
 setInterval(checkStatus, 300000);
-
 </script>
 
 </body>
