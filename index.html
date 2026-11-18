@@ -253,9 +253,9 @@ a {
 
   <h1>TAS LIVE</h1>
 
-  <div id="status">CHECKING...</div>
+  <div id="status">● OFFLINE</div>
 
-  <p id="message">Checking TikTok status...</p>
+  <p id="message">TAS IS NOT LIVE RIGHT NOW.</p>
 
   <p id="lastEnded"></p>
 
@@ -273,7 +273,7 @@ a {
   <p id="galleryMessage">Loading photos...</p>
 </section>
 
-<!-- LOCK BUTTON STAYS VISIBLE ON EVERY SCREEN -->
+<!-- LOCK BUTTON ALWAYS VISIBLE -->
 <button id="lockButton" onclick="lockVisitor()" disabled>
   LOCK
 </button>
@@ -306,18 +306,9 @@ async function checkStatus() {
       { cache: "no-store" }
     );
 
-    if (!response.ok) throw new Error("Status unavailable");
+    if (!response.ok) throw new Error("Could not load status");
 
     const data = await response.json();
-
-    const checkedAt = new Date(data.checked_at).getTime();
-
-    const fresh =
-      Number.isFinite(checkedAt) &&
-      Date.now() - checkedAt < 15 * 60 * 1000 &&
-      Date.now() >= checkedAt;
-
-    if (!fresh) throw new Error("Old status");
 
     if (data.live === true) {
       status.textContent = "● LIVE NOW";
@@ -327,7 +318,7 @@ async function checkStatus() {
       button.href = liveLink;
       lastEnded.textContent = "";
 
-    } else if (data.live === false) {
+    } else {
       status.textContent = "● OFFLINE";
       status.className = "offline";
       message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
@@ -338,15 +329,12 @@ async function checkStatus() {
         ? "LAST STREAM ENDED: " +
           new Date(data.last_stream_ended).toLocaleString()
         : "LAST STREAM ENDED: NOT AVAILABLE YET";
-
-    } else {
-      throw new Error("Could not verify status");
     }
 
   } catch (error) {
-    status.textContent = "STATUS UNAVAILABLE";
-    status.className = "";
-    message.textContent = "Please try again shortly.";
+    status.textContent = "● OFFLINE";
+    status.className = "offline";
+    message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
     button.textContent = "VISIT TAS CHANNEL";
     button.href = channelLink;
     lastEnded.textContent = "";
