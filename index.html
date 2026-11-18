@@ -7,9 +7,7 @@
 <title>TAS LIVE</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   margin: 0;
@@ -21,11 +19,9 @@ html, body {
   text-align: center;
 }
 
-body {
-  overflow: hidden;
-}
+body { overflow: hidden; }
 
-/* HOME SCREEN */
+/* HOME */
 #home {
   width: 100%;
   height: 100vh;
@@ -61,13 +57,8 @@ h1 {
   margin: 20px 0;
 }
 
-.live {
-  color: #20e879;
-}
-
-.offline {
-  color: #ff4545;
-}
+.live { color: #20e879; }
+.offline { color: #ff4545; }
 
 p {
   color: #ccc;
@@ -86,7 +77,7 @@ a {
   border-radius: 12px;
 }
 
-/* FULL SCREEN GALLERY */
+/* GALLERY */
 #gallery {
   display: none;
   position: fixed;
@@ -98,7 +89,6 @@ a {
   background: black;
 }
 
-/* THREE PICTURES WITH BLACK SEPARATORS */
 #photoGrid {
   position: absolute;
   inset: 0;
@@ -106,10 +96,7 @@ a {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: 1fr;
   gap: 4px;
-  padding: 0;
-  margin: 0;
   background: black;
 }
 
@@ -119,12 +106,9 @@ a {
   height: 100%;
   min-width: 0;
   min-height: 0;
-  object-fit: fill;
-  border: 0;
-  margin: 0;
+  object-fit: cover;
 }
 
-/* TRANSPARENT BACK BUTTON */
 #closeGallery {
   position: absolute;
   z-index: 10;
@@ -148,6 +132,49 @@ a {
   color: white;
   pointer-events: none;
 }
+
+/* FLOATING RED LOCK BUTTON */
+#lockButton {
+  position: fixed;
+  z-index: 25;
+  right: 18px;
+  bottom: 18px;
+  padding: 15px 22px;
+  background: #e00000;
+  color: white;
+  border: 2px solid white;
+  border-radius: 12px;
+  font-size: 19px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* LOCK SCREEN */
+#lockScreen {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+#lockScreen h2 {
+  color: red;
+  font-size: clamp(35px, 8vw, 75px);
+}
+
+#countdown {
+  font-size: clamp(35px, 8vw, 70px);
+  font-weight: bold;
+  letter-spacing: 3px;
+}
 </style>
 </head>
 
@@ -159,9 +186,7 @@ a {
   <h1>TAS LIVE</h1>
 
   <div id="status">CHECKING...</div>
-
   <p id="message">Checking TikTok status...</p>
-
   <p id="lastEnded"></p>
 
   <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
@@ -171,18 +196,25 @@ a {
 
 <section id="gallery">
   <button id="closeGallery" onclick="closeGallery()">← BACK</button>
-
   <div id="photoGrid"></div>
-
   <p id="galleryMessage">Loading photos...</p>
 </section>
 
-<script>
-const liveLink =
-  "https://www.tiktok.com/@tasosanastasios/live";
+<button id="lockButton" onclick="activateLock()">🔒 LOCK</button>
 
-const channelLink =
-  "https://www.tiktok.com/@tasosanastasios";
+<section id="lockScreen">
+  <h2>🔒 TAS LOCKED</h2>
+  <p>THIS WEBSITE IS TEMPORARILY LOCKED</p>
+  <p>TIME REMAINING</p>
+  <div id="countdown">18:00:00</div>
+</section>
+
+<script>
+const liveLink = "https://www.tiktok.com/@tasosanastasios/live";
+const channelLink = "https://www.tiktok.com/@tasosanastasios";
+
+const LOCK_DURATION = 18 * 60 * 60 * 1000;
+const LOCK_KEY = "tas_site_lock_until";
 
 async function checkStatus() {
   const status = document.getElementById("status");
@@ -273,8 +305,53 @@ function closeGallery() {
   document.getElementById("home").style.display = "flex";
 }
 
+/* 18-HOUR LOCK SYSTEM */
+function activateLock() {
+  const confirmed = confirm(
+    "Are you sure? This website will be locked for 18 hours."
+  );
+
+  if (!confirmed) return;
+
+  const unlockTime = Date.now() + LOCK_DURATION;
+
+  localStorage.setItem(LOCK_KEY, String(unlockTime));
+
+  updateLock();
+}
+
+function updateLock() {
+  const savedTime = Number(localStorage.getItem(LOCK_KEY) || 0);
+  const screen = document.getElementById("lockScreen");
+  const button = document.getElementById("lockButton");
+
+  if (savedTime > Date.now()) {
+    screen.style.display = "flex";
+    button.style.display = "none";
+
+    const remaining = savedTime - Date.now();
+
+    const hours = Math.floor(remaining / 3600000);
+    const minutes = Math.floor((remaining % 3600000) / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+
+    document.getElementById("countdown").textContent =
+      String(hours).padStart(2, "0") + ":" +
+      String(minutes).padStart(2, "0") + ":" +
+      String(seconds).padStart(2, "0");
+
+  } else {
+    localStorage.removeItem(LOCK_KEY);
+    screen.style.display = "none";
+    button.style.display = "block";
+  }
+}
+
 checkStatus();
+updateLock();
+
 setInterval(checkStatus, 300000);
+setInterval(updateLock, 1000);
 </script>
 
 </body>
