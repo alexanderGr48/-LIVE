@@ -6,81 +6,85 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#000000">
 <title>TAS LIVE</title>
-
 <style>
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #000;
-  color: #fff;
-  font-family: Arial, sans-serif;
-}
-
+* { box-sizing: border-box; }
 body {
+  margin: 0;
+  min-height: 100vh;
+  background: #000;
+  color: white;
+  font-family: Arial, sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
-
-main {
-  width: 100%;
-  padding: 30px;
-}
-
+main { padding: 25px; width: 100%; }
 h1 {
   font-size: clamp(55px, 12vw, 130px);
-  letter-spacing: 10px;
+  letter-spacing: 8px;
   margin: 0 0 25px;
 }
-
-p {
-  font-size: clamp(20px, 3vw, 36px);
-  color: #ddd;
+#status {
+  font-size: clamp(32px, 7vw, 65px);
+  font-weight: bold;
+  margin: 25px 0;
 }
-
+#status.live { color: #20e879; }
+#status.offline { color: #ff4545; }
+p { color: #ccc; font-size: 22px; }
 a {
   display: inline-block;
-  margin-top: 35px;
+  margin-top: 25px;
   padding: 24px 45px;
   background: #fe2c55;
   color: white;
   text-decoration: none;
-  font-size: clamp(22px, 3vw, 36px);
+  font-size: clamp(22px, 4vw, 36px);
   font-weight: bold;
   border-radius: 12px;
 }
-
-@media (max-height: 500px) {
-  h1 { font-size: 55px; }
-  a { margin-top: 10px; padding: 12px 25px; }
-}
 </style>
 </head>
-
 <body>
 <main>
   <h1>TAS LIVE</h1>
-  <p>OPENING TIKTOK LIVE...</p>
-
+  <div id="status">CHECKING...</div>
+  <p id="message">Checking TikTok LIVE status</p>
   <a href="https://www.tiktok.com/@tasosanastasios/live">
     WATCH TAS LIVE
   </a>
 </main>
 
 <script>
-const liveURL = "https://www.tiktok.com/@tasosanastasios/live";
+async function checkStatus() {
+  const status = document.getElementById("status");
+  const message = document.getElementById("message");
 
-setTimeout(function() {
-  window.location.href = liveURL;
-}, 1200);
+  try {
+    const response = await fetch("/status.json?t=" + Date.now());
+    if (!response.ok) throw new Error("Status unavailable");
+
+    const data = await response.json();
+
+    if (data.live === true) {
+      status.textContent = "● LIVE NOW";
+      status.className = "live";
+      message.textContent = "TAS is LIVE on TikTok!";
+    } else {
+      status.textContent = "● OFFLINE";
+      status.className = "offline";
+      message.textContent = "TAS is not live right now.";
+    }
+  } catch (error) {
+    status.textContent = "STATUS UNAVAILABLE";
+    status.className = "";
+    message.textContent = "Please try again shortly.";
+  }
+}
+
+checkStatus();
+setInterval(checkStatus, 60000);
 </script>
-
 </body>
 </html>
