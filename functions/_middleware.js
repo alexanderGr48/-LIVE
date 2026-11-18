@@ -1,11 +1,11 @@
 
-const DESTINATION = "https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO";
+const DESTINATION =
+  "https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO";
 
 export async function onRequest(context) {
   const { request, env, next } = context;
   const pathname = new URL(request.url).pathname;
 
-  // Let the ban API work normally.
   if (pathname === "/api/ban") {
     return next();
   }
