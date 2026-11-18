@@ -11,19 +11,26 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  width: 100%;
+  min-height: 100%;
   background: black;
   color: white;
   font-family: Arial, sans-serif;
   text-align: center;
 }
 
-/* MAIN SCREEN */
+body {
+  overflow: hidden;
+}
+
+/* HOME SCREEN */
 #home {
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: 12px 20px 30px;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  padding: 8px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,6 +39,7 @@ body {
 
 #picsButton {
   margin-bottom: 35px;
+  transform: translateY(-15px);
   padding: 12px 38px;
   background: transparent;
   border: 2px solid white;
@@ -78,54 +86,61 @@ a {
   border-radius: 12px;
 }
 
-/* PICTURES SCREEN */
+/* FULL SCREEN GALLERY */
 #gallery {
   display: none;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
   height: 100vh;
   height: 100dvh;
-  width: 100%;
   overflow: hidden;
-  position: relative;
   background: black;
 }
 
 /* THREE PICTURES SIDE BY SIDE */
 #photoGrid {
-  height: 100%;
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: 1fr;
   gap: 0;
   padding: 0;
+  margin: 0;
 }
 
 #photoGrid img {
+  display: block;
   width: 100%;
   height: 100%;
   min-width: 0;
   min-height: 0;
-  object-fit: contain;
-  display: block;
-  background: black;
+  object-fit: fill;
+  border: 0;
+  margin: 0;
 }
 
-/* BACK BUTTON */
+/* BACK BUTTON ON TOP OF PICTURES */
 #closeGallery {
   position: absolute;
-  z-index: 2;
-  top: 10px;
-  left: 10px;
-  padding: 10px 16px;
-  background: rgba(0,0,0,.75);
-  border: 1px solid white;
+  z-index: 10;
+  top: 12px;
+  left: 12px;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid white;
   border-radius: 8px;
   color: white;
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 #galleryMessage {
   position: absolute;
+  z-index: 5;
   top: 50%;
   left: 0;
   width: 100%;
