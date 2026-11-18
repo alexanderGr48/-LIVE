@@ -38,9 +38,10 @@ jobs:
 
           async def check_once():
               client = TikTokLiveClient(unique_id=USERNAME)
-              return bool(await asyncio.wait_for(
+              result = await asyncio.wait_for(
                   client.is_live(), timeout=25
-              ))
+              )
+              return bool(result)
 
           async def main():
               live = None
