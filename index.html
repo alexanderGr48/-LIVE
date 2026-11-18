@@ -3,8 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#000000">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TAS LIVE</title>
 
 <style>
@@ -16,230 +15,211 @@ html, body {
   margin: 0;
   width: 100%;
   min-height: 100%;
-  background: black;
+  background: #000;
   color: white;
   font-family: Arial, sans-serif;
-  text-align: center;
 }
 
 body {
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* HOME SCREEN */
 #home {
-  width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  padding: 8px 20px 20px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-/* PICS BUTTON - MOVED HIGHER */
-#picsButton {
-  margin-bottom: 35px;
-  transform: translateY(-50px);
-  padding: 12px 38px;
-  background: transparent;
-  border: 2px solid white;
-  color: white;
-  border-radius: 10px;
-  font-size: 25px;
-  font-weight: bold;
+  text-align: center;
+  padding: 20px;
 }
 
 h1 {
-  font-size: clamp(55px, 12vw, 130px);
-  letter-spacing: 8px;
+  font-size: clamp(48px, 10vw, 110px);
   margin: 0 0 20px;
+  font-weight: 900;
 }
 
 #status {
-  font-size: clamp(32px, 7vw, 65px);
-  font-weight: bold;
-  margin: 20px 0;
+  font-size: clamp(55px, 12vw, 130px);
+  font-weight: 900;
+  margin: 10px 0;
 }
 
-.live {
-  color: #20e879;
+#message {
+  font-size: 22px;
+  margin: 10px;
 }
 
-.offline {
-  color: #ff4545;
+#lastEnded {
+  font-size: 15px;
+  color: #aaa;
+  margin: 8px;
 }
 
-p {
-  color: #ccc;
-  font-size: clamp(18px, 3vw, 26px);
-}
-
-#watchButton {
+.mainButton {
   display: inline-block;
-  margin-top: 20px;
-  padding: 22px 30px;
-  background: #fe2c55;
-  color: white;
+  margin: 15px;
+  padding: 18px 35px;
+  background: white;
+  color: black;
   text-decoration: none;
-  font-size: clamp(20px, 4vw, 36px);
-  font-weight: bold;
-  border-radius: 12px;
-}
-
-/* FULL SCREEN GALLERY */
-#gallery {
-  display: none;
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-  background: black;
-}
-
-#photoGrid {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px;
-  background: black;
-}
-
-#photoGrid img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  object-fit: cover;
-}
-
-/* BACK BUTTON */
-#closeGallery {
-  position: absolute;
-  z-index: 10;
-  top: 12px;
-  left: 12px;
-  padding: 12px 20px;
-  background: transparent;
-  border: 2px solid white;
+  border: 0;
   border-radius: 8px;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-#galleryMessage {
-  position: absolute;
-  z-index: 5;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  color: white;
-  pointer-events: none;
-}
-
-/* FLOATING LOCK BUTTON */
-#lockButton {
-  position: fixed;
-  z-index: 100;
-  right: 18px;
-  bottom: 18px;
-  padding: 15px 22px;
-  background: #e00000;
-  color: white;
-  border: 2px solid white;
-  border-radius: 12px;
-  font-size: 19px;
+  font-size: 24px;
   font-weight: bold;
   cursor: pointer;
 }
 
+#picsButton {
+  transform: translateY(-50px);
+}
+
+#gallery {
+  display: none;
+  width: 100%;
+  height: 100vh;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  background: black;
+  position: relative;
+}
+
+.photoPanel {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.photoPanel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#backButton {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+  padding: 12px 22px;
+  color: white;
+  background: rgba(0,0,0,0.35);
+  border: 2px solid white;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#lockButton {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20;
+  width: 65px;
+  height: 65px;
+  border: none;
+  border-radius: 50%;
+  background: red;
+  color: white;
+  font-size: 27px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(255,0,0,0.5);
+}
+
 #lockButton:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
+  cursor: wait;
+}
+
+#error {
+  color: #ff5555;
+  font-size: 14px;
 }
 </style>
 </head>
 
 <body>
 
-<main id="home">
-  <button id="picsButton" onclick="openGallery()">PICS</button>
-
+<div id="home">
   <h1>TAS LIVE</h1>
 
-  <div id="status">CHECKING...</div>
-
-  <p id="message">Checking TikTok status...</p>
-
-  <p id="lastEnded"></p>
+  <div id="status">LOADING</div>
+  <div id="message">Checking TikTok LIVE status...</div>
+  <div id="lastEnded"></div>
+  <div id="error"></div>
 
   <a id="watchButton"
+     class="mainButton"
      href="https://www.tiktok.com/@tasosanastasios"
      target="_blank"
      rel="noopener noreferrer">
-    VISIT TAS CHANNEL
+    OPEN TIKTOK
   </a>
-</main>
 
-<section id="gallery">
-  <button id="closeGallery" onclick="closeGallery()">← BACK</button>
-  <div id="photoGrid"></div>
-  <p id="galleryMessage">Loading photos...</p>
-</section>
+  <button id="picsButton" class="mainButton" onclick="openGallery()">
+    PICS
+  </button>
+</div>
 
-<button id="lockButton" onclick="activateLock()">
-  🔒 LOCK
+<div id="gallery">
+  <button id="backButton" onclick="closeGallery()">BACK</button>
+
+  <div class="photoPanel" id="photo1"></div>
+  <div class="photoPanel" id="photo2"></div>
+  <div class="photoPanel" id="photo3"></div>
+</div>
+
+<button id="lockButton" onclick="activateLock()" title="LOCK">
+  LOCK
 </button>
 
 <script>
-const liveLink =
-  "https://www.tiktok.com/@tasosanastasios/live";
+const YOUTUBE_DESTINATION =
+  "https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO";
 
-const channelLink =
-  "https://www.tiktok.com/@tasosanastasios";
+const GITHUB_PICS =
+  "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics";
 
 let banReady = false;
 
-/* CHECK VISITOR BAN STATUS */
 async function checkBan() {
+  const button = document.getElementById("lockButton");
+
   try {
     const response = await fetch("/api/ban", {
       method: "GET",
-      cache: "no-store",
-      credentials: "same-origin"
+      cache: "no-store"
     });
 
     if (!response.ok) {
-      throw new Error("Could not check ban");
+      throw new Error("Ban check failed");
     }
 
     const data = await response.json();
 
     if (data.banned) {
-      window.location.replace("/blocked.html");
+      window.location.replace(YOUTUBE_DESTINATION);
       return false;
     }
 
     banReady = true;
+    button.disabled = false;
     return true;
 
   } catch (error) {
-    document.getElementById("lockButton").disabled = true;
-    document.getElementById("message").textContent =
-      "Could not verify website access. Please try again.";
+    document.getElementById("error").textContent =
+      "Could not connect to the ban system.";
 
+    button.disabled = true;
     return false;
   }
 }
 
-/* ACTIVATE PERSONAL 45-MINUTE BAN */
 async function activateLock() {
   if (!banReady) return;
 
@@ -249,125 +229,127 @@ async function activateLock() {
   try {
     const response = await fetch("/api/ban", {
       method: "POST",
-      cache: "no-store",
-      credentials: "same-origin"
+      cache: "no-store"
     });
 
     if (!response.ok) {
       throw new Error("Ban failed");
     }
 
-    window.location.replace("/blocked.html");
+    window.location.replace(YOUTUBE_DESTINATION);
 
   } catch (error) {
     button.disabled = false;
-    alert("Could not activate the ban. Please try again.");
+    document.getElementById("error").textContent =
+      "Could not activate the ban. Please try again.";
   }
 }
 
-/* CHECK TIKTOK STATUS */
 async function checkStatus() {
-  const status = document.getElementById("status");
-  const message = document.getElementById("message");
-  const lastEnded = document.getElementById("lastEnded");
-  const button = document.getElementById("watchButton");
-
   try {
-    const response = await fetch(
-      "/status.json?t=" + Date.now(),
-      { cache: "no-store" }
-    );
+    const response = await fetch("/status.json?t=" + Date.now(), {
+      cache: "no-store"
+    });
 
-    if (!response.ok) throw new Error();
+    if (!response.ok) throw new Error("Status unavailable");
 
     const data = await response.json();
 
+    const status = document.getElementById("status");
+    const message = document.getElementById("message");
+    const lastEnded = document.getElementById("lastEnded");
+    const watchButton = document.getElementById("watchButton");
+
     if (data.live === true) {
-      status.textContent = "● LIVE NOW";
-      status.className = "live";
-      message.textContent = "TAS IS LIVE ON TIKTOK!";
-      button.textContent = "WATCH TAS LIVE";
-      button.href = liveLink;
-      lastEnded.textContent = "";
+      status.textContent = "LIVE";
+      status.style.color = "#00ff55";
+      message.textContent = "TAS IS LIVE NOW";
+
+      watchButton.textContent = "WATCH TAS LIVE";
+      watchButton.href =
+        "https://www.tiktok.com/@tasosanastasios/live";
 
     } else {
-      status.textContent = "● OFFLINE";
-      status.className = "offline";
-      message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
-      button.textContent = "VISIT TAS CHANNEL";
-      button.href = channelLink;
+      status.textContent = "OFFLINE";
+      status.style.color = "#ff3333";
+      message.textContent = "TAS IS NOT LIVE";
 
-      lastEnded.textContent = data.last_stream_ended
-        ? "LAST STREAM ENDED: " +
-          new Date(data.last_stream_ended).toLocaleString()
-        : "LAST STREAM ENDED: NOT AVAILABLE YET";
+      watchButton.textContent = "OPEN TIKTOK";
+      watchButton.href =
+        "https://www.tiktok.com/@tasosanastasios";
+    }
+
+    if (data.last_stream_ended) {
+      const date = new Date(data.last_stream_ended);
+
+      lastEnded.textContent =
+        "Last stream ended: " + date.toLocaleString();
+    } else {
+      lastEnded.textContent = "";
     }
 
   } catch (error) {
-    status.textContent = "STATUS UNAVAILABLE";
-    status.className = "";
-    message.textContent = "Could not check TikTok status.";
+    document.getElementById("message").textContent =
+      "Could not load LIVE status.";
   }
 }
 
-/* OPEN GALLERY - LOAD THREE REAL PHOTOS */
 async function openGallery() {
   document.getElementById("home").style.display = "none";
-  document.getElementById("gallery").style.display = "block";
+  document.getElementById("gallery").style.display = "grid";
 
-  const grid = document.getElementById("photoGrid");
-  const message = document.getElementById("galleryMessage");
+  const panels = [
+    document.getElementById("photo1"),
+    document.getElementById("photo2"),
+    document.getElementById("photo3")
+  ];
 
-  grid.innerHTML = "";
-  message.textContent = "Loading photos...";
+  panels.forEach(panel => panel.innerHTML = "");
 
   try {
-    const response = await fetch(
-      "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics"
-    );
+    const response = await fetch(GITHUB_PICS);
 
-    if (!response.ok) throw new Error();
+    if (!response.ok) {
+      throw new Error("Could not load pictures");
+    }
 
     const files = await response.json();
 
     const photos = files
-      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name))
+      .filter(file =>
+        file.type === "file" &&
+        /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+      )
       .sort((a, b) => a.name.localeCompare(b.name))
       .slice(0, 3);
 
-    if (photos.length === 0) {
-      message.textContent = "No photos uploaded yet.";
-      return;
-    }
-
-    photos.forEach(file => {
+    photos.forEach((photo, index) => {
       const img = document.createElement("img");
-      img.src = file.download_url;
-      img.alt = "TAS photo";
-      grid.appendChild(img);
+      img.src = photo.download_url;
+      img.alt = "TAS picture " + (index + 1);
+      panels[index].appendChild(img);
     });
 
-    message.textContent = "";
-
   } catch (error) {
-    message.textContent = "Could not load photos.";
+    panels[0].textContent = "Could not load pictures";
   }
 }
 
-/* CLOSE GALLERY */
 function closeGallery() {
   document.getElementById("gallery").style.display = "none";
   document.getElementById("home").style.display = "flex";
 }
 
-/* START WEBSITE */
 async function startWebsite() {
+  document.getElementById("lockButton").disabled = true;
+
   const allowed = await checkBan();
 
   if (!allowed) return;
 
-  checkStatus();
-  setInterval(checkStatus, 300000);
+  await checkStatus();
+
+  setInterval(checkStatus, 5 * 60 * 1000);
 }
 
 startWebsite();
