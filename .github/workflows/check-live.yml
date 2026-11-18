@@ -12,6 +12,7 @@ permissions:
 jobs:
   check-live:
     runs-on: ubuntu-latest
+
     steps:
       - name: Get repository
         uses: actions/checkout@v4
@@ -22,7 +23,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install checker
-        run: pip install TikTokLive
+        run: pip install --upgrade TikTokLive
 
       - name: Check TikTok status
         run: |
@@ -33,9 +34,30 @@ jobs:
           from pathlib import Path
           from TikTokLive import TikTokLiveClient
 
+          USERNAME = "tasosanastasios"
+
+          async def check_once():
+              client = TikTokLiveClient(unique_id=USERNAME)
+              result = await asyncio.wait_for(
+                  client.is_live(),
+                  timeout=25
+              )
+              return bool(result)
+
           async def main():
-              client = TikTokLiveClient(unique_id="tasosanastasios")
-              live = bool(await client.is_live())
+              live = None
+
+              try:
+                  first = await check_once()
+                  await asyncio.sleep(3)
+                  second = await check_once()
+
+                  if first == second:
+                      live = second
+
+              except Exception as error:
+                  print("TikTok check failed:", repr(error))
+                  live = None
 
               path = Path("status.json")
 
@@ -49,16 +71,22 @@ jobs:
 
               last_ended = previous.get("last_stream_ended")
 
-              if previous.get("live") is True and not live:
-                  last_ended = datetime.now(timezone.utc).isoformat()
+              if previous.get("live") is True and live is False:
+                  last_ended = datetime.now(
+                      timezone.utc
+                  ).isoformat()
 
               data = {
                   "live": live,
-                  "username": "tasosanastasios",
+                  "username": USERNAME,
+                  "checked_at": datetime.now(
+                      timezone.utc
+                  ).isoformat(),
                   "last_stream_ended": last_ended
               }
 
               path.write_text(json.dumps(data, indent=2))
+              print(json.dumps(data, indent=2))
 
           asyncio.run(main())
           PY
