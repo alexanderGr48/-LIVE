@@ -98,7 +98,7 @@ a {
   background: black;
 }
 
-/* THREE PICTURES SIDE BY SIDE */
+/* THREE PICTURES WITH BLACK SEPARATORS */
 #photoGrid {
   position: absolute;
   inset: 0;
@@ -107,9 +107,10 @@ a {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: 1fr;
-  gap: 0;
+  gap: 4px;
   padding: 0;
   margin: 0;
+  background: black;
 }
 
 #photoGrid img {
@@ -123,14 +124,14 @@ a {
   margin: 0;
 }
 
-/* BACK BUTTON ON TOP OF PICTURES */
+/* TRANSPARENT BACK BUTTON */
 #closeGallery {
   position: absolute;
   z-index: 10;
   top: 12px;
   left: 12px;
   padding: 12px 20px;
-  background: rgba(0, 0, 0, 0.8);
+  background: transparent;
   border: 2px solid white;
   border-radius: 8px;
   color: white;
