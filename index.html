@@ -26,6 +26,7 @@ body {
   overflow: hidden;
 }
 
+/* HOME SCREEN */
 #home {
   width: 100%;
   height: 100vh;
@@ -37,6 +38,7 @@ body {
   justify-content: center;
 }
 
+/* PICS BUTTON - MOVED HIGHER */
 #picsButton {
   margin-bottom: 35px;
   transform: translateY(-50px);
@@ -86,6 +88,7 @@ p {
   border-radius: 12px;
 }
 
+/* FULL SCREEN GALLERY */
 #gallery {
   display: none;
   position: fixed;
@@ -148,6 +151,7 @@ p {
   pointer-events: none;
 }
 
+/* FLOATING LOCK BUTTON */
 #lockButton {
   position: fixed;
   z-index: 100;
@@ -182,7 +186,10 @@ p {
 
   <p id="lastEnded"></p>
 
-  <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
+  <a id="watchButton"
+     href="https://www.tiktok.com/@tasosanastasios"
+     target="_blank"
+     rel="noopener noreferrer">
     VISIT TAS CHANNEL
   </a>
 </main>
@@ -206,7 +213,7 @@ const channelLink =
 
 let banReady = false;
 
-/* CHECK VISITOR BAN */
+/* CHECK VISITOR BAN STATUS */
 async function checkBan() {
   try {
     const response = await fetch("/api/ban", {
@@ -215,7 +222,9 @@ async function checkBan() {
       credentials: "same-origin"
     });
 
-    if (!response.ok) throw new Error();
+    if (!response.ok) {
+      throw new Error("Could not check ban");
+    }
 
     const data = await response.json();
 
@@ -231,11 +240,12 @@ async function checkBan() {
     document.getElementById("lockButton").disabled = true;
     document.getElementById("message").textContent =
       "Could not verify website access. Please try again.";
+
     return false;
   }
 }
 
-/* ACTIVATE 45-MINUTE BAN */
+/* ACTIVATE PERSONAL 45-MINUTE BAN */
 async function activateLock() {
   if (!banReady) return;
 
@@ -249,7 +259,9 @@ async function activateLock() {
       credentials: "same-origin"
     });
 
-    if (!response.ok) throw new Error();
+    if (!response.ok) {
+      throw new Error("Ban failed");
+    }
 
     window.location.replace("/blocked.html");
 
@@ -284,16 +296,7 @@ async function checkStatus() {
       button.href = liveLink;
       lastEnded.textContent = "";
 
-      // Automatically open LIVE once per browser tab session.
-      if (!sessionStorage.getItem("tasAutoOpenedLive")) {
-        sessionStorage.setItem("tasAutoOpenedLive", "yes");
-        window.location.assign(liveLink);
-        return;
-      }
-
     } else {
-      sessionStorage.removeItem("tasAutoOpenedLive");
-
       status.textContent = "● OFFLINE";
       status.className = "offline";
       message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
@@ -370,13 +373,13 @@ function closeGallery() {
   document.getElementById("home").style.display = "flex";
 }
 
-/* START */
+/* START WEBSITE */
 async function startWebsite() {
   const allowed = await checkBan();
 
   if (!allowed) return;
 
-  await checkStatus();
+  checkStatus();
   setInterval(checkStatus, 300000);
 }
 
