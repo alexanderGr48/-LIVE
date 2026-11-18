@@ -29,16 +29,36 @@ jobs:
           python - <<'PY'
           import asyncio
           import json
+          from datetime import datetime, timezone
+          from pathlib import Path
           from TikTokLive import TikTokLiveClient
 
           async def main():
               client = TikTokLiveClient(unique_id="tasosanastasios")
-              live = await client.is_live()
-              with open("status.json", "w") as f:
-                  json.dump({
-                      "live": bool(live),
-                      "username": "tasosanastasios"
-                  }, f)
+              live = bool(await client.is_live())
+
+              path = Path("status.json")
+
+              if path.exists():
+                  try:
+                      previous = json.loads(path.read_text())
+                  except Exception:
+                      previous = {}
+              else:
+                  previous = {}
+
+              last_ended = previous.get("last_stream_ended")
+
+              if previous.get("live") is True and not live:
+                  last_ended = datetime.now(timezone.utc).isoformat()
+
+              data = {
+                  "live": live,
+                  "username": "tasosanastasios",
+                  "last_stream_ended": last_ended
+              }
+
+              path.write_text(json.dumps(data, indent=2))
 
           asyncio.run(main())
           PY
