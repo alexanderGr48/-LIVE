@@ -26,7 +26,6 @@ body {
   overflow: hidden;
 }
 
-/* HOME SCREEN */
 #home {
   width: 100%;
   height: 100vh;
@@ -40,7 +39,7 @@ body {
 
 #picsButton {
   margin-bottom: 35px;
-  transform: translateY(-15px);
+  transform: translateY(-50px);
   padding: 12px 38px;
   background: transparent;
   border: 2px solid white;
@@ -87,7 +86,6 @@ p {
   border-radius: 12px;
 }
 
-/* FULL SCREEN GALLERY */
 #gallery {
   display: none;
   position: fixed;
@@ -150,7 +148,6 @@ p {
   pointer-events: none;
 }
 
-/* FLOATING LOCK BUTTON */
 #lockButton {
   position: fixed;
   z-index: 100;
@@ -209,22 +206,21 @@ const channelLink =
 
 let banReady = false;
 
-/* CHECK VISITOR BAN STATUS */
+/* CHECK VISITOR BAN */
 async function checkBan() {
   try {
     const response = await fetch("/api/ban", {
       method: "GET",
-      cache: "no-store"
+      cache: "no-store",
+      credentials: "same-origin"
     });
 
-    if (!response.ok) {
-      throw new Error("Could not check ban");
-    }
+    if (!response.ok) throw new Error();
 
     const data = await response.json();
 
     if (data.banned) {
-      document.documentElement.innerHTML = "";
+      window.location.replace("/blocked.html");
       return false;
     }
 
@@ -235,12 +231,11 @@ async function checkBan() {
     document.getElementById("lockButton").disabled = true;
     document.getElementById("message").textContent =
       "Could not verify website access. Please try again.";
-
     return false;
   }
 }
 
-/* ACTIVATE PERSONAL 45-MINUTE BAN */
+/* ACTIVATE 45-MINUTE BAN */
 async function activateLock() {
   if (!banReady) return;
 
@@ -250,15 +245,13 @@ async function activateLock() {
   try {
     const response = await fetch("/api/ban", {
       method: "POST",
-      cache: "no-store"
+      cache: "no-store",
+      credentials: "same-origin"
     });
 
-    if (!response.ok) {
-      throw new Error("Ban failed");
-    }
+    if (!response.ok) throw new Error();
 
-    // Navigate to a page blocked by the middleware.
-    window.location.replace("/");
+    window.location.replace("/blocked.html");
 
   } catch (error) {
     button.disabled = false;
@@ -291,7 +284,16 @@ async function checkStatus() {
       button.href = liveLink;
       lastEnded.textContent = "";
 
+      // Automatically open LIVE once per browser tab session.
+      if (!sessionStorage.getItem("tasAutoOpenedLive")) {
+        sessionStorage.setItem("tasAutoOpenedLive", "yes");
+        window.location.assign(liveLink);
+        return;
+      }
+
     } else {
+      sessionStorage.removeItem("tasAutoOpenedLive");
+
       status.textContent = "● OFFLINE";
       status.className = "offline";
       message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
@@ -349,7 +351,6 @@ async function openGallery() {
       message.textContent = "";
     }
 
-    // Third panel: black and red.
     const redPanel = document.createElement("div");
     redPanel.className = "redPanel";
     grid.appendChild(redPanel);
@@ -369,13 +370,13 @@ function closeGallery() {
   document.getElementById("home").style.display = "flex";
 }
 
-/* START WEBSITE */
+/* START */
 async function startWebsite() {
   const allowed = await checkBan();
 
   if (!allowed) return;
 
-  checkStatus();
+  await checkStatus();
   setInterval(checkStatus, 300000);
 }
 
