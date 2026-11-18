@@ -81,20 +81,38 @@ a {
   border-radius: 12px;
 }
 
+/* FIXED RED CIRCULAR LOCK BUTTON */
 #lockButton {
-  margin-top: 18px;
-  padding: 12px 30px;
-  background: transparent;
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 99999;
+
+  width: 76px;
+  height: 76px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ff2020;
   color: white;
   border: 2px solid white;
-  border-radius: 10px;
-  font-size: 20px;
+  border-radius: 50%;
+
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
+
+  box-shadow: 0 0 16px rgba(255, 32, 32, 0.65);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 #lockButton:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* PICTURES SCREEN */
@@ -157,7 +175,7 @@ a {
 /* RESPONSIVE SCREENS */
 @media (max-width: 600px) {
   #home {
-    padding: 20px 14px 30px;
+    padding: 20px 14px 100px;
   }
 
   #picsButton {
@@ -177,6 +195,13 @@ a {
   a {
     padding: 20px 25px;
   }
+
+  #lockButton {
+    width: 68px;
+    height: 68px;
+    right: 14px;
+    bottom: 14px;
+  }
 }
 
 @media (max-width: 600px) and (orientation: portrait) {
@@ -188,7 +213,7 @@ a {
 
 @media (max-height: 500px) and (orientation: landscape) {
   #home {
-    padding: 8px 15px;
+    padding: 8px 15px 90px;
   }
 
   #picsButton {
@@ -217,12 +242,6 @@ a {
     padding: 12px 24px;
     font-size: 21px;
   }
-
-  #lockButton {
-    margin-top: 8px;
-    padding: 7px 20px;
-    font-size: 16px;
-  }
 }
 </style>
 </head>
@@ -244,10 +263,6 @@ a {
      href="https://www.tiktok.com/@tasosanastasios">
     VISIT TAS CHANNEL
   </a>
-
-  <button id="lockButton" onclick="lockVisitor()" disabled>
-    LOCK
-  </button>
 </main>
 
 <section id="gallery">
@@ -257,6 +272,11 @@ a {
 
   <p id="galleryMessage">Loading photos...</p>
 </section>
+
+<!-- LOCK BUTTON STAYS VISIBLE ON EVERY SCREEN -->
+<button id="lockButton" onclick="lockVisitor()" disabled>
+  LOCK
+</button>
 
 <script>
 const liveLink =
