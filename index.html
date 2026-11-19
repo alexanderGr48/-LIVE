@@ -3,554 +3,1424 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#000000">
 <title>TAS LIVE</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#000;color:white;font-family:Arial,sans-serif;text-align:center}
-button{cursor:pointer;font-weight:bold}
-#home{padding:28px 12px 90px}
-h1{font-size:clamp(48px,10vw,90px);margin:25px 0 12px;letter-spacing:3px}
-#status{font-size:clamp(26px,5vw,48px);font-weight:bold;margin:20px}
-#message{color:#aaa;font-size:15px}
-.mainbtn{display:block;margin:14px auto;width:min(280px,85%);padding:17px;border:0;border-radius:10px;background:#222;color:white;font-size:22px}
-.mainbtn:hover{background:#444}
-#tiktok{background:#e90045}
-#gameScreen{display:none;position:fixed;inset:0;background:#080b12;z-index:5;overflow:hidden}
-#gameTop{height:48px;display:flex;justify-content:space-between;align-items:center;padding:5px 12px;background:#10141d}
-#gameTitle{font-weight:bold;letter-spacing:2px}
-#closeGame{background:#333;color:white;border:0;border-radius:7px;padding:9px 14px}
-#gameCanvas{display:block;width:100%;height:calc(100% - 135px);background:#101827;touch-action:none}
-#gameHud{position:absolute;top:58px;left:10px;right:10px;display:flex;justify-content:space-between;gap:12px;pointer-events:none;text-align:left}
-.hudBox{width:min(230px,42%);background:#111c;padding:8px;border:1px solid #ffffff33;border-radius:8px}
-.hudLabel{font-size:12px;margin-bottom:5px}
-.bar{height:12px;background:#3b2020;border-radius:10px;overflow:hidden}
-.barFill{height:100%;width:100%;background:#35c75b;transition:width .15s}
-#bossHud{display:none}
-#bossFill{background:#e64b42}
-#gameMessage{position:absolute;top:22%;left:10%;right:10%;font-size:clamp(18px,3vw,28px);font-weight:bold;text-shadow:0 2px 5px #000;pointer-events:none}
-#controls{height:87px;display:flex;justify-content:center;align-items:center;gap:18px;background:#10141d}
-.control{width:76px;height:62px;border:1px solid #777;border-radius:14px;background:#292f3a;color:white;font-size:17px;touch-action:none}
-.control:active{background:#59677b}
-#shopPanel{display:none;position:fixed;z-index:9;inset:8% 5%;background:#171b24;border:2px solid #9d814d;border-radius:14px;padding:18px;overflow:auto}
-.shopItem{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#252b37;margin:10px 0;padding:12px;border-radius:8px}
-.shopItem button{background:#9d814d;color:white;border:0;padding:9px 13px;border-radius:7px}
-#closeShop{background:#555;color:white;border:0;padding:10px 18px;border-radius:7px}
-#gallery{display:none;position:fixed;inset:0;background:#000;z-index:4;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr;gap:0}
-#gallery img{width:100%;height:100%;object-fit:contain}
-#galleryBack{position:fixed;z-index:6;top:10px;left:10px;background:#222;color:white;border:0;border-radius:8px;padding:12px;display:none}
-#lock{position:fixed;right:18px;bottom:18px;width:68px;height:68px;border-radius:50%;border:3px solid white;background:#d50000;color:white;font-size:15px;z-index:10}
-#lock:disabled{opacity:.45}
-@media(max-width:650px){
- #gallery{grid-template-columns:1fr;grid-template-rows:repeat(3,1fr)}
- #gameCanvas{height:calc(100% - 135px)}
- .control{width:28%;max-width:110px}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #000;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+button { font-family: inherit; cursor: pointer; }
+
+#home {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  padding: 12px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#gamesButton, #picsButton {
+  margin-bottom: 15px;
+  padding: 12px 38px;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  border-radius: 10px;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+#picsButton { margin-bottom: 35px; }
+
+h1 {
+  font-size: clamp(55px, 12vw, 130px);
+  letter-spacing: 8px;
+  margin: 0 0 20px;
+}
+
+#status {
+  font-size: clamp(32px, 7vw, 65px);
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.live { color: #20e879; }
+.offline { color: #ff4545; }
+
+p {
+  color: #ccc;
+  font-size: clamp(18px, 3vw, 26px);
+}
+
+#watchButton {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 22px 30px;
+  background: #fe2c55;
+  color: white;
+  text-decoration: none;
+  font-size: clamp(20px, 4vw, 36px);
+  font-weight: bold;
+  border-radius: 12px;
+}
+
+/* LOCK BUTTON */
+#lockButton {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 99999;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff2020;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: bold;
+  box-shadow: 0 0 16px rgba(255,32,32,.65);
+}
+
+#lockButton:disabled { opacity: .5; }
+
+/* GALLERY */
+#gallery {
+  display: none;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: black;
+}
+
+#photoGrid {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+}
+
+#photoGrid img {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  background: black;
+}
+
+#closeGallery {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  padding: 10px 16px;
+  background: rgba(0,0,0,.8);
+  border: 1px solid white;
+  border-radius: 8px;
+  color: white;
+}
+
+#galleryMessage {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* GAME */
+#gameScreen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #090b12;
+  z-index: 20;
+  overflow: hidden;
+}
+
+#gameTop {
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  background: #11151e;
+  border-bottom: 1px solid #424956;
+  gap: 8px;
+}
+
+.gameTopButton {
+  background: #292f3c;
+  border: 1px solid #777;
+  color: white;
+  padding: 8px 13px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+#gemCount {
+  color: #ffd65a;
+  font-weight: bold;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: calc(100% - 155px);
+  background: #242d40;
+  touch-action: none;
+}
+
+#gameControls {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #11151e;
+  padding: 8px 12px;
+  gap: 12px;
+}
+
+.controlButton {
+  flex: 1;
+  max-width: 180px;
+  height: 76px;
+  background: linear-gradient(#414b60,#202736);
+  color: white;
+  border: 2px solid #8793a6;
+  border-radius: 15px;
+  font-size: 21px;
+  font-weight: bold;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.controlButton:active {
+  background: #65738b;
+  transform: scale(.96);
+}
+
+/* GAME MENU AND SHOP */
+#gameMenu, #shopScreen, #resultScreen {
+  position: absolute;
+  inset: 55px 0 0;
+  z-index: 5;
+  display: none;
+  background: rgba(5,8,15,.96);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#gameMenu h2, #shopScreen h2, #resultScreen h2 {
+  font-size: clamp(30px,6vw,55px);
+  margin: 10px;
+}
+
+.gameDescription {
+  max-width: 500px;
+  line-height: 1.5;
+  font-size: 17px;
+}
+
+.menuButton {
+  display: block;
+  min-width: 190px;
+  margin: 9px;
+  padding: 15px 22px;
+  background: #76502e;
+  color: white;
+  border: 2px solid #c9a16b;
+  border-radius: 10px;
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.shopItem {
+  width: min(330px,90%);
+  padding: 14px;
+  margin: 8px;
+  background: #202735;
+  border: 1px solid #707b8d;
+  border-radius: 10px;
+}
+
+.shopItem button {
+  margin-top: 8px;
+  padding: 9px 20px;
+  background: #b17a36;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  font-weight: bold;
+}
+
+@media(max-width:600px) {
+  #home { padding: 20px 14px 100px; }
+
+  #gamesButton, #picsButton {
+    padding: 11px 30px;
+    font-size: 21px;
+  }
+
+  h1 { letter-spacing: 4px; }
+  #status { margin: 16px 0; }
+  #watchButton { padding: 20px 25px; }
+
+  #lockButton {
+    width: 68px;
+    height: 68px;
+    right: 14px;
+    bottom: 14px;
+  }
+}
+
+@media(max-width:600px) and (orientation:portrait) {
+  #photoGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3,minmax(0,1fr));
+  }
+}
+
+@media(max-height:500px) and (orientation:landscape) {
+  #gameCanvas { height: calc(100% - 125px); }
+  #gameControls { height: 70px; }
+  .controlButton { height: 55px; }
+  #gameTop { height: 45px; }
 }
 </style>
 </head>
+
 <body>
 
 <main id="home">
+  <button id="gamesButton" onclick="openGame()">GAMES</button>
+  <button id="picsButton" onclick="openGallery()">PICS</button>
+
   <h1>TAS LIVE</h1>
-  <div id="status">CHECKING...</div>
-  <div id="message">Live status updates automatically</div>
+  <div id="status" class="offline">● OFFLINE</div>
+  <p id="message">TAS IS NOT LIVE RIGHT NOW.</p>
   <p id="lastEnded"></p>
 
-  <button class="mainbtn" onclick="openGame()">GAMES</button>
-  <button class="mainbtn" onclick="openGallery()">PICS</button>
-  <button class="mainbtn" id="tiktok" onclick="window.open('https://www.tiktok.com/@tasosanastasios','_blank')">OPEN TIKTOK</button>
-  <button class="mainbtn" onclick="openShop()">ITEM SHOP</button>
+  <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
+    VISIT TAS CHANNEL
+  </a>
 </main>
 
-<div id="gallery"></div>
-<button id="galleryBack" onclick="closeGallery()">BACK</button>
+<section id="gallery">
+  <button id="closeGallery" onclick="closeGallery()">← BACK</button>
+  <div id="photoGrid"></div>
+  <p id="galleryMessage">Loading photos...</p>
+</section>
 
-<div id="gameScreen">
+<section id="gameScreen">
+
   <div id="gameTop">
-    <span id="gameTitle">THE CASTLE QUEST</span>
-    <span id="gemCount">💎 0</span>
-    <button id="closeGame" onclick="closeGame()">EXIT</button>
+    <button class="gameTopButton" onclick="leaveGame()">← EXIT</button>
+    <div id="gemCount">💎 0</div>
+    <button class="gameTopButton" onclick="openShop()">SHOP</button>
   </div>
-  <div id="gameHud">
-    <div class="hudBox">
-      <div class="hudLabel">YOUR HEALTH</div>
-      <div class="bar"><div class="barFill" id="playerFill"></div></div>
-    </div>
-    <div class="hudBox" id="bossHud">
-      <div class="hudLabel">CASTLE GUARDIAN</div>
-      <div class="bar"><div class="barFill" id="bossFill"></div></div>
-    </div>
-  </div>
-  <div id="gameMessage">Reach the castle gate!</div>
+
   <canvas id="gameCanvas"></canvas>
-  <div id="controls">
-    <button class="control" id="leftBtn">LEFT</button>
-    <button class="control" id="jumpBtn">JUMP</button>
-    <button class="control" id="rightBtn">RIGHT</button>
+
+  <div id="gameControls">
+    <button class="controlButton" id="leftButton">◀ LEFT</button>
+    <button class="controlButton" id="rightButton">RIGHT ▶</button>
+    <button class="controlButton" id="jumpButton">▲ JUMP</button>
   </div>
-</div>
 
-<div id="shopPanel">
-  <h2>⚒️ ITEM SHOP</h2>
-  <p>Gems: <strong id="shopGems">0</strong></p>
-  <p>Spend your victory gems on character styles.</p>
-  <div id="shopItems"></div>
-  <button id="closeShop" onclick="closeShop()">CLOSE</button>
-</div>
+  <div id="gameMenu">
+    <h2>TAS: CASTLE ESCAPE</h2>
+    <p class="gameDescription">
+      Escape through the medieval castle. Complete the parkour,
+      solve the switches and defeat the castle boss.
+    </p>
+    <button class="menuButton" onclick="startGame()">PLAY</button>
+    <button class="menuButton" onclick="openShop()">ITEM SHOP</button>
+    <button class="menuButton" onclick="leaveGame()">EXIT GAME</button>
+  </div>
 
-<button id="lock" disabled>LOCK</button>
+  <div id="shopScreen">
+    <h2>ITEM SHOP</h2>
+    <p>💎 Your gems: <span id="shopGems">0</span></p>
+
+    <div class="shopItem">
+      <strong>Golden Ball</strong>
+      <p>Change your ball to gold.</p>
+      <button onclick="buyItem('gold',30)">BUY — 30 💎</button>
+    </div>
+
+    <div class="shopItem">
+      <strong>Blue Ball</strong>
+      <p>Change your ball to blue.</p>
+      <button onclick="buyItem('blue',40)">BUY — 40 💎</button>
+    </div>
+
+    <div class="shopItem">
+      <strong>Silver Sword</strong>
+      <p>Change your sword's appearance.</p>
+      <button onclick="buyItem('silver',25)">BUY — 25 💎</button>
+    </div>
+
+    <button class="menuButton" onclick="closeShop()">BACK</button>
+  </div>
+
+  <div id="resultScreen">
+    <h2 id="resultTitle">VICTORY!</h2>
+    <p id="resultMessage">You defeated the boss!</p>
+    <button class="menuButton" onclick="startGame()">PLAY AGAIN</button>
+    <button class="menuButton" onclick="openShop()">ITEM SHOP</button>
+    <button class="menuButton" onclick="leaveGame()">EXIT</button>
+  </div>
+
+</section>
+
+<button id="lockButton" onclick="lockVisitor()" disabled>LOCK</button>
 
 <script>
-/* WEBSITE STATUS */
-const statusEl=document.getElementById('status');
-async function checkStatus(){
-  try{
-    const r=await fetch('/status.json?t='+Date.now(),{cache:'no-store'});
-    if(!r.ok)throw new Error('Status unavailable');
-    const d=await r.json();
-    if(d.live===true){
-      statusEl.textContent='🔴 LIVE NOW';
-      statusEl.style.color='#ff3030';
-    }else{
-      statusEl.textContent='⚫ OFFLINE';
-      statusEl.style.color='#aaa';
-    }
-    const last=document.getElementById('lastEnded');
-    last.textContent=d.last_stream_ended
-      ? 'Last stream ended: '+new Date(d.last_stream_ended).toLocaleString()
-      : '';
-  }catch(e){
-    statusEl.textContent='⚫ OFFLINE';
-    statusEl.style.color='#aaa';
-  }
-}
-checkStatus();
-setInterval(checkStatus,5000);
+"use strict";
 
-/* PICS GALLERY */
-async function openGallery(){
-  const gallery=document.getElementById('gallery');
-  gallery.style.display='grid';
-  document.getElementById('galleryBack').style.display='block';
-  gallery.innerHTML='<p style="grid-column:1/-1">Loading pictures...</p>';
-  try{
-    const r=await fetch('https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics');
-    if(!r.ok)throw new Error('Could not load pictures');
-    const files=await r.json();
-    const pics=files.filter(f=>/\.(jpg|jpeg|png|gif|webp)$/i.test(f.name))
-      .sort((a,b)=>a.name.localeCompare(b.name)).slice(0,3);
-    gallery.innerHTML='';
-    if(!pics.length)gallery.innerHTML='<p>No pictures found in the pics folder.</p>';
-    pics.forEach(f=>{
-      const img=document.createElement('img');
-      img.src=f.download_url;
-      img.alt=f.name;
-      gallery.appendChild(img);
-    });
-  }catch(e){
-    gallery.innerHTML='<p>Could not load pictures. Check the pics folder in GitHub.</p>';
+/* CONFIGURATION */
+const liveLink = "https://www.tiktok.com/@tasosanastasios/live";
+const channelLink = "https://www.tiktok.com/@tasosanastasios";
+const youtubeDestination =
+  "https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO";
+
+const photoFolder =
+  "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics";
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+let banReady = false;
+
+/* SAFE LOCAL STORAGE */
+function loadNumber(key, fallback) {
+  try {
+    const value = Number(localStorage.getItem(key));
+    return Number.isFinite(value) && value >= 0 ? value : fallback;
+  } catch {
+    return fallback;
   }
 }
-function closeGallery(){
-  document.getElementById('gallery').style.display='none';
-  document.getElementById('galleryBack').style.display='none';
+
+function loadOwned() {
+  try {
+    const data = JSON.parse(localStorage.getItem("tasOwned") || "[]");
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+/* TIKTOK STATUS */
+async function checkStatus() {
+  const status = document.getElementById("status");
+  const message = document.getElementById("message");
+  const lastEnded = document.getElementById("lastEnded");
+  const button = document.getElementById("watchButton");
+
+  try {
+    const response = await fetch("/status.json?t=" + Date.now(), {
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error("Status unavailable");
+
+    const data = await response.json();
+
+    if (data.live === true) {
+      status.textContent = "● LIVE NOW";
+      status.className = "live";
+      message.textContent = "TAS IS LIVE ON TIKTOK!";
+      button.textContent = "WATCH TAS LIVE";
+      button.href = liveLink;
+      lastEnded.textContent = "";
+    } else {
+      status.textContent = "● OFFLINE";
+      status.className = "offline";
+      message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
+      button.textContent = "VISIT TAS CHANNEL";
+      button.href = channelLink;
+
+      lastEnded.textContent = data.last_stream_ended
+        ? "LAST STREAM ENDED: " +
+          new Date(data.last_stream_ended).toLocaleString()
+        : "LAST STREAM ENDED: NOT AVAILABLE YET";
+    }
+  } catch {
+    status.textContent = "● OFFLINE";
+    status.className = "offline";
+    message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
+    button.textContent = "VISIT TAS CHANNEL";
+    button.href = channelLink;
+    lastEnded.textContent = "";
+  }
 }
 
 /* LOCK SYSTEM */
-const youtubeDestination='https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO';
-const lockButton=document.getElementById('lock');
-let banReady=false;
-async function checkBan(){
-  try{
-    const r=await fetch('/api/ban',{cache:'no-store'});
-    if(!r.ok)throw new Error();
-    const d=await r.json();
-    if(d.banned)window.location.replace(youtubeDestination);
-    banReady=true;
-    lockButton.disabled=false;
-  }catch(e){
-    lockButton.disabled=true;
+async function checkBan() {
+  const lockButton = document.getElementById("lockButton");
+
+  try {
+    const response = await fetch("/api/ban", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error("Ban status unavailable");
+
+    const data = await response.json();
+
+    if (data.banned) {
+      window.location.replace(youtubeDestination);
+      return;
+    }
+
+    banReady = true;
+    lockButton.disabled = false;
+  } catch {
+    banReady = false;
+    lockButton.disabled = true;
   }
 }
-checkBan();
-lockButton.addEventListener('click',async()=>{
-  if(!banReady)return;
-  lockButton.disabled=true;
-  try{
-    await fetch('/api/ban',{method:'POST',cache:'no-store'});
+
+async function lockVisitor() {
+  if (!banReady) return;
+
+  const lockButton = document.getElementById("lockButton");
+  lockButton.disabled = true;
+
+  try {
+    const response = await fetch("/api/ban", {
+      method: "POST",
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error("Lock request failed");
+
     window.location.replace(youtubeDestination);
-  }catch(e){
-    lockButton.disabled=false;
-    alert('Could not activate the lock. Please try again.');
+  } catch {
+    lockButton.disabled = false;
   }
-});
+}
 
-/* GAME */
-const canvas=document.getElementById('gameCanvas');
-const ctx=canvas.getContext('2d');
-const gameScreen=document.getElementById('gameScreen');
-const messageEl=document.getElementById('gameMessage');
-let running=false,lastTime=0,scene='castle',camera=0;
-let keys={left:false,right:false};
-let player,boss,platforms,switches,gate,portal;
-let elapsed=0,attackCooldown=0,damageCooldown=0,gameWon=false;
-let gems=Number(localStorage.getItem('tasGems')||0);
-let owned=JSON.parse(localStorage.getItem('tasOwned')||'["default"]');
-let equipped=localStorage.getItem('tasEquipped')||'default';
+/* GALLERY */
+async function openGallery() {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("gallery").style.display = "block";
 
-const skins={
- default:{name:'Knight Silver',price:0,color:'#d9dce4'},
- gold:{name:'Golden Knight',price:25,color:'#e9b943'},
- blue:{name:'Royal Blue',price:35,color:'#4d8ce2'},
- emerald:{name:'Emerald Knight',price:40,color:'#35bd83'},
- shadow:{name:'Shadow Knight',price:50,color:'#55536e'}
+  const grid = document.getElementById("photoGrid");
+  const message = document.getElementById("galleryMessage");
+
+  grid.innerHTML = "";
+  message.textContent = "Loading photos...";
+
+  try {
+    const response = await fetch(photoFolder + "?t=" + Date.now());
+
+    if (!response.ok) throw new Error("Gallery unavailable");
+
+    const files = await response.json();
+
+    const photos = files
+      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .slice(0, 3);
+
+    if (!photos.length) {
+      message.textContent = "No photos uploaded yet.";
+      return;
+    }
+
+    photos.forEach(file => {
+      if (!file.download_url) return;
+
+      const img = document.createElement("img");
+      img.src = file.download_url;
+      img.alt = "TAS photo";
+      img.loading = "lazy";
+      grid.appendChild(img);
+    });
+
+    message.textContent = grid.children.length
+      ? ""
+      : "No photos uploaded yet.";
+
+  } catch {
+    message.textContent = "Could not load photos.";
+  }
+}
+
+function closeGallery() {
+  document.getElementById("gallery").style.display = "none";
+  document.getElementById("home").style.display = "flex";
+}
+
+/* GAME STATE */
+let gameActive = false;
+let gameState = "menu";
+let animationFrame = null;
+let lastTime = 0;
+let cameraX = 0;
+
+let gems = loadNumber("tasGems", 0);
+let owned = loadOwned();
+
+let ballColor = "#e5e8ee";
+let swordColor = "#cbd5e1";
+
+const input = {
+  left: false,
+  right: false,
+  jump: false
 };
 
-function resizeCanvas(){
-  const rect=canvas.getBoundingClientRect();
-  const dpr=Math.min(window.devicePixelRatio||1,2);
-  canvas.width=Math.max(1,Math.floor(rect.width*dpr));
-  canvas.height=Math.max(1,Math.floor(rect.height*dpr));
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-window.addEventListener('resize',resizeCanvas);
+const world = {
+  width: 3200,
+  ground: 470
+};
 
-function openGame(){
-  closeGallery();
-  gameScreen.style.display='block';
+let player = null;
+let boss = null;
+let switches = [];
+let gate = null;
+let bossStarted = false;
+let rewardGiven = false;
+
+/* RESTORE PURCHASED ITEMS */
+function applyOwnedItems() {
+  ballColor = "#e5e8ee";
+  swordColor = "#cbd5e1";
+
+  if (owned.includes("gold")) ballColor = "#e8b83f";
+  if (owned.includes("blue")) ballColor = "#3998e8";
+  if (owned.includes("silver")) swordColor = "#e8edf5";
+}
+
+applyOwnedItems();
+
+/* GEM DISPLAY */
+function updateGems() {
+  document.getElementById("gemCount").textContent = "💎 " + gems;
+  document.getElementById("shopGems").textContent = gems;
+
+  try {
+    localStorage.setItem("tasGems", String(gems));
+  } catch {}
+}
+
+/* GAME NAVIGATION */
+function openGame() {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+  document.getElementById("gameMenu").style.display = "flex";
+  document.getElementById("shopScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+
+  gameState = "menu";
   resizeCanvas();
-  startGame();
-}
-function closeGame(){
-  running=false;
-  gameScreen.style.display='none';
-}
-function updateGemDisplay(){
-  document.getElementById('gemCount').textContent='💎 '+gems;
+  updateGems();
+  drawGame();
 }
 
-function startGame(){
-  scene='castle';camera=0;elapsed=0;gameWon=false;
-  player={x:70,y:0,vx:0,vy:0,w:34,h:42,hp:100,onGround:false,facing:1,invuln:0};
-  boss={x:0,y:0,hp:100,maxHp:100,attackTimer:2};
-  platforms=[
-    {x:0,y:430,w:420,h:90},{x:490,y:390,w:190,h:35},
-    {x:740,y:350,w:190,h:35},{x:990,y:410,w:180,h:35},
-    {x:1220,y:350,w:200,h:35},{x:1480,y:410,w:190,h:35},
-    {x:1740,y:360,w:210,h:35},{x:2010,y:420,w:240,h:35},
-    {x:2280,y:380,w:330,h:100}
+function leaveGame() {
+  gameActive = false;
+  cancelAnimationFrame(animationFrame);
+  animationFrame = null;
+
+  input.left = false;
+  input.right = false;
+  input.jump = false;
+
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("home").style.display = "flex";
+}
+
+/* CANVAS SIZE */
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawGame();
+}
+
+window.addEventListener("resize", () => {
+  if (document.getElementById("gameScreen").style.display === "block") {
+    resizeCanvas();
+  }
+});
+
+/* WORLD OBJECTS */
+const platforms = [
+  {x:330,y:390,w:150,h:22},
+  {x:550,y:330,w:145,h:22},
+  {x:760,y:390,w:150,h:22},
+  {x:1040,y:380,w:150,h:22},
+  {x:1250,y:320,w:160,h:22},
+  {x:1490,y:380,w:150,h:22},
+  {x:1770,y:370,w:150,h:22},
+  {x:1970,y:315,w:160,h:22},
+  {x:2330,y:390,w:140,h:22},
+  {x:2510,y:340,w:150,h:22}
+];
+
+const hazards = [
+  {x:490,w:55},
+  {x:920,w:70},
+  {x:1410,w:65},
+  {x:1920,w:65},
+  {x:2440,w:55}
+];
+
+/* START GAME */
+function startGame() {
+  document.getElementById("gameMenu").style.display = "none";
+  document.getElementById("shopScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+
+  player = {
+    x: 60,
+    y: world.ground - 35,
+    vx: 0,
+    vy: 0,
+    r: 24,
+    health: 3,
+    onGround: true,
+    facing: 1,
+    attackCooldown: 0,
+    invulnerable: 0
+  };
+
+  boss = {
+    x: 2780,
+    y: world.ground - 65,
+    health: 5,
+    maxHealth: 5,
+    attackTimer: 1.5,
+    flash: 0
+  };
+
+  switches = [
+    {x:850,active:false},
+    {x:1730,active:false}
   ];
-  switches=[{x:830,y:320,on:false},{x:1570,y:380,on:false}];
-  gate={x:1880,open:false};
-  portal={x:2450,y:300};
-  attackCooldown=0;damageCooldown=0;
-  document.getElementById('bossHud').style.display='none';
-  setMessage('Cross the broken castle bridges. Find both switches!');
-  updateGemDisplay();
-  running=true;
-  lastTime=performance.now();
-  requestAnimationFrame(loop);
+
+  gate = {
+    x: 2250,
+    open: false
+  };
+
+  cameraX = 0;
+  bossStarted = false;
+  rewardGiven = false;
+
+  gameState = "playing";
+  gameActive = true;
+  lastTime = performance.now();
+
+  input.left = false;
+  input.right = false;
+  input.jump = false;
+
+  cancelAnimationFrame(animationFrame);
+  animationFrame = requestAnimationFrame(gameLoop);
 }
-function setMessage(t){messageEl.textContent=t;}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 
-function loop(now){
-  if(!running)return;
-  const dt=Math.min((now-lastTime)/1000,.035);
-  lastTime=now;
-  update(dt);
-  draw();
-  requestAnimationFrame(loop);
+/* MAIN GAME LOOP */
+function gameLoop(now) {
+  if (!gameActive) return;
+
+  const dt = Math.min((now - lastTime) / 1000, 0.035);
+  lastTime = now;
+
+  updateGame(dt);
+  drawGame();
+
+  if (gameActive) {
+    animationFrame = requestAnimationFrame(gameLoop);
+  }
 }
-function update(dt){
-  elapsed+=dt;
-  attackCooldown=Math.max(0,attackCooldown-dt);
-  damageCooldown=Math.max(0,damageCooldown-dt);
-  player.invuln=Math.max(0,player.invuln-dt);
 
-  const speed=scene==='castle'?225:205;
-  player.vx=(keys.right?speed:0)-(keys.left?speed:0);
-  if(player.vx)player.facing=player.vx>0?1:-1;
-  player.x+=player.vx*dt;
-  player.vy+=1050*dt;
-  player.y+=player.vy*dt;
-  player.onGround=false;
+/* UPDATE GAME */
+function updateGame(dt) {
+  if (gameState !== "playing" || !player) return;
 
-  if(scene==='castle'){
-    for(const p of platforms){
-      if(player.x+player.w>p.x&&player.x<p.x+p.w&&
-        player.y+player.h>=p.y&&player.y+player.h<=p.y+28&&player.vy>=0){
-        player.y=p.y-player.h;player.vy=0;player.onGround=true;
-      }
+  const speed = 260;
+
+  player.vx = 0;
+
+  if (input.left) {
+    player.vx = -speed;
+    player.facing = -1;
+  }
+
+  if (input.right) {
+    player.vx = speed;
+    player.facing = 1;
+  }
+
+  if (input.jump && player.onGround) {
+    player.vy = -570;
+    player.onGround = false;
+  }
+
+  player.x += player.vx * dt;
+  player.x = Math.max(20, Math.min(world.width - 30, player.x));
+
+  const oldY = player.y;
+
+  player.vy += 1450 * dt;
+  player.y += player.vy * dt;
+  player.onGround = false;
+
+  if (player.y + player.r >= world.ground) {
+    player.y = world.ground - player.r;
+    player.vy = 0;
+    player.onGround = true;
+  }
+
+  /* PLATFORM COLLISION */
+  for (const p of platforms) {
+    const overlaps =
+      player.x + player.r > p.x &&
+      player.x - player.r < p.x + p.w;
+
+    if (
+      overlaps &&
+      player.vy >= 0 &&
+      oldY + player.r <= p.y + 8 &&
+      player.y + player.r >= p.y
+    ) {
+      player.y = p.y - player.r;
+      player.vy = 0;
+      player.onGround = true;
     }
-    if(player.y>700){
-      player.hp-=18;
-      player.x=Math.max(50,player.x-100);
-      player.y=250;player.vy=0;
-      setMessage('Careful! You fell. Keep going!');
-      updateBars();
+  }
+
+  /* SWITCHES */
+  for (const sw of switches) {
+    if (
+      !sw.active &&
+      Math.abs(player.x - sw.x) < 42 &&
+      player.y > world.ground - 100
+    ) {
+      sw.active = true;
     }
-    for(const s of switches){
-      if(!s.on&&Math.abs((player.x+player.w/2)-s.x)<42&&Math.abs(player.y-s.y)<65){
-        s.on=true;
-        setMessage('Switch activated!');
-      }
+  }
+
+  gate.open = switches.every(sw => sw.active);
+
+  /* GATE */
+  if (
+    !gate.open &&
+    player.x + player.r > gate.x &&
+    player.x < gate.x + 20
+  ) {
+    player.x = gate.x - player.r;
+  }
+
+  /* HAZARDS */
+  for (const h of hazards) {
+    if (
+      player.x + player.r > h.x &&
+      player.x - player.r < h.x + h.w &&
+      player.y + player.r >= world.ground - 8
+    ) {
+      hurtPlayer();
+      if (!gameActive) return;
     }
-    gate.open=switches.every(s=>s.on);
-    if(player.x>gate.x&&!gate.open)player.x=gate.x-player.w;
-    if(gate.open&&player.x>portal.x-25){
-      scene='portal';
-      setMessage('The portal opens...');
-      setTimeout(()=>{
-        if(running&&scene==='portal'){
-          scene='boss';camera=0;
-          player.x=120;player.y=300;player.vy=0;
-          boss={x:790,y:0,hp:100,maxHp:100,attackTimer:2};
-          document.getElementById('bossHud').style.display='block';
-          setMessage('THE CASTLE GUARDIAN! Jump over its ground waves!');
+  }
+
+  player.attackCooldown = Math.max(0, player.attackCooldown - dt);
+  player.invulnerable = Math.max(0, player.invulnerable - dt);
+  boss.flash = Math.max(0, boss.flash - dt);
+
+  /* BOSS */
+  if (player.x > 2580) bossStarted = true;
+
+  if (bossStarted && boss.health > 0) {
+    const distance = Math.abs(player.x - boss.x);
+
+    if (
+      distance < 125 &&
+      player.attackCooldown <= 0 &&
+      Math.abs(player.y - boss.y) < 100
+    ) {
+      boss.health--;
+      boss.flash = 0.25;
+      player.attackCooldown = 0.65;
+    }
+
+    boss.attackTimer -= dt;
+
+    if (boss.attackTimer <= 0) {
+      boss.attackTimer = 2.1;
+
+      if (distance < 180 && player.invulnerable <= 0) {
+        if (player.onGround) {
+          hurtPlayer();
+          if (!gameActive) return;
         }
-      },1100);
+      }
     }
-  }else if(scene==='boss'){
-    const floor=canvas.clientHeight-105;
-    if(player.y+player.h>=floor){
-      player.y=floor-player.h;player.vy=0;player.onGround=true;
-    }
-    if(player.x<20)player.x=20;
-    if(player.x>canvas.clientWidth-60)player.x=canvas.clientWidth-60;
 
-    boss.attackTimer-=dt;
-    if(boss.attackTimer<=0){
-      boss.attackTimer=2.5;
-      boss.wave=true;
-      boss.waveTimer=.8;
-    }
-    if(boss.waveTimer>0){
-      boss.waveTimer-=dt;
-      if(boss.waveTimer<=0)boss.wave=false;
-    }
-    const close=Math.abs((player.x+player.w/2)-(boss.x+55))<125;
-    if(close&&attackCooldown<=0){
-      boss.hp=Math.max(0,boss.hp-9);
-      attackCooldown=.72;
-      setMessage('Your sword strikes the guardian!');
-      updateBars();
-    }
-    if(boss.wave&&player.onGround&&damageCooldown<=0&&Math.abs(player.x-boss.x)<240){
-      player.hp-=12;damageCooldown=1.2;
-      setMessage('Jump over the guardian’s ground wave!');
-      updateBars();
-    }
-    if(boss.hp<=0&&!gameWon){
-      gameWon=true;gems+=50;
-      localStorage.setItem('tasGems',String(gems));
-      updateGemDisplay();
-      setMessage('VICTORY! You earned 50 gems!');
-      scene='victory';
-      document.getElementById('bossHud').style.display='none';
+    if (boss.health <= 0 && !rewardGiven) {
+      rewardGiven = true;
+      gems += 50;
+      updateGems();
+      finishGame(true);
+      return;
     }
   }
 
-  if(player.hp<=0){
-    player.hp=100;player.x=scene==='boss'?100:70;player.y=200;player.vy=0;
-    if(scene==='boss')boss.hp=Math.min(100,boss.hp+12);
-    setMessage('You recovered. Try again!');
-  }
-  camera=scene==='castle'?clamp(player.x-canvas.clientWidth*.35,0,2700):0;
-  updateBars();
-}
-function updateBars(){
-  document.getElementById('playerFill').style.width=clamp(player.hp,0,100)+'%';
-  document.getElementById('bossFill').style.width=(boss.hp/boss.maxHp*100)+'%';
+  /* CAMERA
+     The game world uses a logical width of 1000 units. */
+  const logicalViewWidth = 1000;
+
+  cameraX = Math.max(
+    0,
+    Math.min(
+      world.width - logicalViewWidth,
+      player.x - logicalViewWidth * 0.35
+    )
+  );
+
+  if (player.y > 650) hurtPlayer();
 }
 
-/* DRAWING */
-function draw(){
-  const w=canvas.clientWidth,h=canvas.clientHeight;
-  ctx.clearRect(0,0,w,h);
-  if(scene==='castle'||scene==='portal')drawCastle(w,h);
-  else drawArena(w,h);
-  if(scene!=='victory')drawPlayer(w,h);
-  if(scene==='boss'||scene==='victory')drawBoss(w,h);
-  if(scene==='victory'){
-    ctx.fillStyle='#ffffff';ctx.textAlign='center';
-    ctx.font='bold 32px Arial';ctx.fillText('CASTLE CLEARED!',w/2,h/2-10);
-    ctx.font='20px Arial';ctx.fillText('+50 GEMS',w/2,h/2+30);
-    ctx.font='15px Arial';ctx.fillText('Exit the game to return to the website',w/2,h/2+65);
+/* PLAYER DAMAGE */
+function hurtPlayer() {
+  if (!player || player.invulnerable > 0) return;
+
+  player.health--;
+  player.invulnerable = 1.2;
+
+  if (player.health <= 0) {
+    finishGame(false);
+  } else {
+    player.y = world.ground - player.r;
+    player.vy = -220;
   }
 }
-function drawCastle(w,h){
-  const sky=ctx.createLinearGradient(0,0,0,h);
-  sky.addColorStop(0,'#182a46');sky.addColorStop(1,'#b17b53');
-  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
-  ctx.fillStyle='#26364a';
-  for(let i=0;i<8;i++){
-    let x=((i*300-camera*.25)%1600+1600)%1600;
-    ctx.fillRect(x,100,110,260);
-    ctx.fillRect(x-18,80,146,25);
-    for(let j=0;j<4;j++)ctx.fillRect(x+12+j*27,50,14,55);
+
+/* GAME RESULT */
+function finishGame(won) {
+  gameActive = false;
+  gameState = won ? "won" : "lost";
+
+  document.getElementById("resultTitle").textContent =
+    won ? "VICTORY!" : "TRY AGAIN";
+
+  document.getElementById("resultMessage").textContent =
+    won
+      ? "You defeated the castle boss and earned 50 gems!"
+      : "Your adventure ended. Try the castle again!";
+
+  document.getElementById("resultScreen").style.display = "flex";
+  updateGems();
+}
+
+/* DRAW GAME */
+function drawGame() {
+  if (!canvas.width || !canvas.height) return;
+
+  const W = canvas.clientWidth;
+  const H = canvas.clientHeight;
+
+  if (!W || !H) return;
+
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.save();
+  ctx.scale(W / 1000, H / 560);
+  ctx.translate(-cameraX, 0);
+
+  /* SKY */
+  const sky = ctx.createLinearGradient(0, 0, 0, 560);
+  sky.addColorStop(0, "#19263c");
+  sky.addColorStop(0.65, "#536078");
+  sky.addColorStop(1, "#bd9270");
+
+  ctx.fillStyle = sky;
+  ctx.fillRect(cameraX, 0, 1100, 560);
+
+  /* DISTANT CASTLE */
+  ctx.fillStyle = "#293246";
+
+  for (let i = 0; i < 9; i++) {
+    const x = cameraX - 100 + i * 180;
+
+    ctx.fillRect(x, 170, 125, 300);
+    ctx.fillRect(x + 25, 125, 30, 45);
+    ctx.fillRect(x + 75, 105, 30, 65);
+
+    ctx.fillStyle = "#1c2637";
+    ctx.beginPath();
+    ctx.moveTo(x + 20, 125);
+    ctx.lineTo(x + 40, 80);
+    ctx.lineTo(x + 60, 125);
+    ctx.fill();
+
+    ctx.fillStyle = "#293246";
   }
-  ctx.fillStyle='#18212b';
-  ctx.fillRect(0,h-85,w,85);
-  for(const p of platforms){
-    const x=p.x-camera;
-    if(x+p.w<0||x>w)continue;
-    ctx.fillStyle='#6c6259';ctx.fillRect(x,p.y,p.w,p.h);
-    ctx.fillStyle='#a99b87';ctx.fillRect(x,p.y,p.w,8);
-    ctx.strokeStyle='#403c39';ctx.lineWidth=2;
-    for(let bx=x+20;bx<x+p.w-10;bx+=55){
-      ctx.beginPath();ctx.moveTo(bx,p.y+8);ctx.lineTo(bx+8,p.y+p.h);ctx.stroke();
+
+  /* STONE WALL */
+  const wall = ctx.createLinearGradient(0, 250, 0, 480);
+  wall.addColorStop(0, "#77716c");
+  wall.addColorStop(1, "#35363d");
+
+  ctx.fillStyle = wall;
+  ctx.fillRect(cameraX, 300, 3400, 180);
+
+  for (
+    let x = Math.floor(cameraX / 100) * 100;
+    x < cameraX + 1100;
+    x += 100
+  ) {
+    ctx.strokeStyle = "rgba(15,18,25,.35)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, 310, 100, 55);
+    ctx.strokeRect(x - 50, 365, 100, 55);
+    ctx.strokeRect(x, 420, 100, 50);
+  }
+
+  /* GROUND */
+  const ground = ctx.createLinearGradient(0, 450, 0, 510);
+  ground.addColorStop(0, "#716052");
+  ground.addColorStop(1, "#28252a");
+
+  ctx.fillStyle = ground;
+  ctx.fillRect(cameraX, world.ground, 3400, 100);
+
+  ctx.fillStyle = "#9b866d";
+  ctx.fillRect(cameraX, world.ground, 3400, 7);
+
+  /* WINDOWS */
+  for (let x = 150; x < 3300; x += 360) {
+    ctx.fillStyle = "#18253c";
+    ctx.beginPath();
+    ctx.arc(x, 260, 24, Math.PI, 0);
+    ctx.lineTo(x + 24, 300);
+    ctx.lineTo(x - 24, 300);
+    ctx.fill();
+
+    ctx.strokeStyle = "#b49a74";
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(255,190,95,.2)";
+    ctx.fillRect(x - 4, 260, 8, 40);
+  }
+
+  /* PLATFORMS */
+  for (const p of platforms) {
+    ctx.fillStyle = "#514b48";
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+
+    ctx.fillStyle = "#a08b72";
+    ctx.fillRect(p.x, p.y, p.w, 6);
+
+    ctx.strokeStyle = "#292a30";
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
+  }
+
+  /* HAZARDS */
+  for (const h of hazards) {
+    ctx.fillStyle = "#303039";
+    ctx.fillRect(h.x, world.ground - 13, h.w, 13);
+
+    ctx.fillStyle = "#b7a18a";
+
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(h.x + i * 20, world.ground - 13);
+      ctx.lineTo(h.x + 10 + i * 20, world.ground - 35);
+      ctx.lineTo(h.x + 20 + i * 20, world.ground - 13);
+      ctx.fill();
     }
   }
-  switches.forEach(s=>{
-    const x=s.x-camera;
-    ctx.fillStyle=s.on?'#4bff8b':'#e2b64e';
-    ctx.beginPath();ctx.arc(x,s.y,13,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#fff';ctx.fillRect(x-3,s.y-24,6,12);
+
+  /* SWITCHES */
+  for (const sw of switches) {
+    ctx.fillStyle = sw.active ? "#36e68a" : "#c58b38";
+    ctx.fillRect(sw.x - 14, world.ground - 22, 28, 22);
+
+    ctx.fillStyle = "#fff2c0";
+    ctx.beginPath();
+    ctx.arc(sw.x, world.ground - 24, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /* GATE */
+  if (gate && !gate.open) {
+    ctx.fillStyle = "#24232a";
+    ctx.fillRect(gate.x, 260, 28, 210);
+
+    ctx.strokeStyle = "#b89a6e";
+    ctx.lineWidth = 5;
+
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(gate.x + i * 9, 260);
+      ctx.lineTo(gate.x + i * 9, 470);
+      ctx.stroke();
+    }
+  } else if (gate && gate.open) {
+    ctx.fillStyle = "#36d68b";
+    ctx.font = "bold 22px Arial";
+    ctx.fillText("GATE OPEN", gate.x - 25, 245);
+  }
+
+  /* TORCHES */
+  for (let x = 200; x < 3200; x += 420) {
+    ctx.fillStyle = "#372b27";
+    ctx.fillRect(x, 220, 8, 35);
+
+    ctx.fillStyle = "#ff9d32";
+    ctx.beginPath();
+    ctx.arc(x + 4, 215, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(255,145,30,.16)";
+    ctx.beginPath();
+    ctx.arc(x + 4, 215, 35, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /* BOSS AND PLAYER */
+  if (boss && (bossStarted || (player && player.x > 2450))) {
+    drawBoss();
+  }
+
+  if (player) drawPlayer();
+
+  ctx.restore();
+
+  /* HUD */
+  ctx.save();
+  ctx.scale(W / 1000, H / 560);
+
+  ctx.fillStyle = "rgba(0,0,0,.6)";
+  ctx.fillRect(12, 12, 260, 65);
+
+  ctx.fillStyle = "white";
+  ctx.font = "bold 19px Arial";
+  ctx.fillText("CASTLE ESCAPE", 24, 38);
+
+  ctx.font = "16px Arial";
+  ctx.fillText(
+    "♥ ".repeat(Math.max(0, player ? player.health : 3)),
+    24,
+    63
+  );
+
+  if (bossStarted && boss && boss.health > 0) {
+    ctx.fillStyle = "rgba(0,0,0,.7)";
+    ctx.fillRect(350, 15, 300, 45);
+
+    ctx.fillStyle = "#e74c4c";
+    ctx.fillRect(
+      365,
+      42,
+      270 * (boss.health / boss.maxHealth),
+      8
+    );
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold 17px Arial";
+    ctx.fillText("CASTLE BOSS", 450, 34);
+  }
+
+  if (switches.length) {
+    ctx.fillStyle = "white";
+    ctx.font = "15px Arial";
+    ctx.fillText(
+      "SWITCHES: " +
+      switches.filter(sw => sw.active).length +
+      "/2",
+      24,
+      98
+    );
+  }
+
+  ctx.restore();
+}
+
+/* DRAW PLAYER */
+function drawPlayer() {
+  if (!player) return;
+
+  ctx.save();
+  ctx.translate(player.x, player.y);
+
+  if (
+    player.invulnerable > 0 &&
+    Math.floor(player.invulnerable * 12) % 2 === 0
+  ) {
+    ctx.globalAlpha = 0.35;
+  }
+
+  /* SWORD */
+  ctx.save();
+  ctx.rotate(player.facing === 1 ? -0.5 : Math.PI + 0.5);
+
+  ctx.fillStyle = "#77502c";
+  ctx.fillRect(15, -3, 20, 7);
+
+  ctx.fillStyle = swordColor;
+  ctx.fillRect(30, -5, 42, 5);
+
+  ctx.fillStyle = "#f0e2c3";
+  ctx.fillRect(29, -10, 5, 16);
+  ctx.restore();
+
+  /* BALL */
+  const ball = ctx.createRadialGradient(-9, -12, 3, 0, 0, 29);
+  ball.addColorStop(0, "#ffffff");
+  ball.addColorStop(0.4, ballColor);
+  ball.addColorStop(1, "#68717d");
+
+  ctx.fillStyle = ball;
+  ctx.beginPath();
+  ctx.arc(0, 0, 24, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#303746";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  /* FACE */
+  ctx.fillStyle = "#18202b";
+  ctx.beginPath();
+  ctx.arc(-8, -5, 3, 0, Math.PI * 2);
+  ctx.arc(8, -5, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#18202b";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 5, 8, 0.15, Math.PI - 0.15);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/* DRAW BOSS */
+function drawBoss() {
+  if (!boss) return;
+
+  const x = boss.x;
+  const y = boss.y;
+
+  ctx.save();
+
+  ctx.fillStyle = "rgba(0,0,0,.35)";
+  ctx.beginPath();
+  ctx.ellipse(x, world.ground - 3, 55, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const armor = ctx.createLinearGradient(x - 35, 0, x + 35, 0);
+  armor.addColorStop(0, "#272c39");
+  armor.addColorStop(0.5, boss.flash > 0 ? "#ffffff" : "#9299a5");
+  armor.addColorStop(1, "#303440");
+
+  ctx.fillStyle = armor;
+  ctx.fillRect(x - 35, y - 55, 70, 95);
+
+  /* HELMET */
+  ctx.fillStyle = "#626c7c";
+  ctx.beginPath();
+  ctx.arc(x, y - 60, 31, Math.PI, 0);
+  ctx.lineTo(x + 30, y - 35);
+  ctx.lineTo(x - 30, y - 35);
+  ctx.fill();
+
+  ctx.fillStyle = "#111827";
+  ctx.fillRect(x - 20, y - 62, 40, 9);
+
+  ctx.fillStyle = "#ff553e";
+  ctx.fillRect(x - 12, y - 60, 7, 4);
+  ctx.fillRect(x + 5, y - 60, 7, 4);
+
+  /* SHIELD */
+  ctx.fillStyle = "#9a713d";
+  ctx.fillRect(x + 27, y - 25, 22, 45);
+
+  ctx.strokeStyle = "#e2bf7b";
+  ctx.strokeRect(x + 27, y - 25, 22, 45);
+
+  /* SWORD */
+  ctx.fillStyle = "#d4d9e1";
+  ctx.fillRect(x - 48, y - 22, 9, 55);
+
+  ctx.fillStyle = "#7d542c";
+  ctx.fillRect(x - 54, y + 5, 22, 6);
+
+  ctx.fillStyle = "white";
+  ctx.font = "bold 18px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("BOSS", x, y - 105);
+
+  ctx.restore();
+}
+
+/* KEYBOARD CONTROLS */
+window.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+    input.left = true;
+  }
+
+  if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+    input.right = true;
+  }
+
+  if (
+    e.key === "ArrowUp" ||
+    e.key === " " ||
+    e.key.toLowerCase() === "w"
+  ) {
+    input.jump = true;
+    e.preventDefault();
+  }
+});
+
+window.addEventListener("keyup", e => {
+  if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+    input.left = false;
+  }
+
+  if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+    input.right = false;
+  }
+
+  if (
+    e.key === "ArrowUp" ||
+    e.key === " " ||
+    e.key.toLowerCase() === "w"
+  ) {
+    input.jump = false;
+  }
+});
+
+window.addEventListener("blur", () => {
+  input.left = false;
+  input.right = false;
+  input.jump = false;
+});
+
+/* TOUCH CONTROLS */
+function holdButton(id, key) {
+  const button = document.getElementById(id);
+
+  button.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    input[key] = true;
+
+    try {
+      button.setPointerCapture(e.pointerId);
+    } catch {}
   });
-  const gx=gate.x-camera;
-  ctx.fillStyle=gate.open?'#2a9b63':'#76553d';
-  ctx.fillRect(gx,h-190,22,105);
-  if(!gate.open){
-    ctx.strokeStyle='#d3b37a';ctx.lineWidth=5;
-    for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(gx+i*7,h-190);ctx.lineTo(gx+i*7,h-85);ctx.stroke();}
-  }
-  const px=portal.x-camera;
-  ctx.save();ctx.translate(px,h-155);
-  ctx.shadowBlur=25;ctx.shadowColor='#55d9ff';
-  ctx.strokeStyle='#6ee7ff';ctx.lineWidth=8;
-  ctx.beginPath();ctx.ellipse(0,0,30,60,0,0,Math.PI*2);ctx.stroke();
-  ctx.fillStyle='#54bce755';ctx.beginPath();ctx.ellipse(0,0,23,53,0,0,Math.PI*2);ctx.fill();
-  ctx.restore();
-  ctx.fillStyle='#fff';ctx.font='14px Arial';ctx.fillText('PORTAL',px-25,h-225);
-}
-function drawArena(w,h){
-  const sky=ctx.createLinearGradient(0,0,0,h);
-  sky.addColorStop(0,'#171326');sky.addColorStop(1,'#573a35');
-  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
-  ctx.fillStyle='#302a38';
-  for(let i=0;i<8;i++){
-    const x=i*w/7;
-    ctx.fillRect(x,65,45,h-170);
-    ctx.fillStyle='#544454';ctx.fillRect(x-10,55,65,14);
-    ctx.fillStyle='#302a38';
-  }
-  ctx.fillStyle='#645044';ctx.fillRect(0,h-105,w,105);
-  ctx.fillStyle='#9a8065';ctx.fillRect(0,h-105,w,8);
-  for(let i=0;i<12;i++){
-    ctx.fillStyle='#4a3d39';ctx.fillRect(i*w/12,h-95,2,90);
-  }
-  // Giant glowing windows
-  for(let i=0;i<3;i++){
-    ctx.fillStyle='#d89a4a33';
-    ctx.beginPath();ctx.arc(w*(.2+i*.3),170,42,Math.PI,0);ctx.lineTo(w*(.2+i*.3)+42,260);ctx.lineTo(w*(.2+i*.3)-42,260);ctx.fill();
-  }
-  if(boss.wave){
-    ctx.fillStyle='#e2a34a88';
-    ctx.fillRect(0,h-120,w,15);
-  }
-}
-function drawPlayer(w,h){
-  const x=player.x-camera,y=player.y;
-  ctx.save();
-  if(player.invuln>0&&Math.floor(performance.now()/90)%2===0)ctx.globalAlpha=.45;
-  // legs
-  ctx.fillStyle='#353d4b';
-  ctx.fillRect(x+7,y+29,8,13);ctx.fillRect(x+21,y+29,8,13);
-  // ball body
-  const skin=skins[equipped]||skins.default;
-  const grad=ctx.createRadialGradient(x+12,y+10,2,x+17,y+19,23);
-  grad.addColorStop(0,'#fff');grad.addColorStop(.25,skin.color);grad.addColorStop(1,'#454b5a');
-  ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x+17,y+19,18,0,Math.PI*2);ctx.fill();
-  // face
-  ctx.fillStyle='#171717';
-  ctx.beginPath();ctx.arc(x+11,y+17,2,0,Math.PI*2);ctx.arc(x+23,y+17,2,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#171717';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.arc(x+17,y+22,5,.15,Math.PI-.15);ctx.stroke();
-  // sword visibly held
-  ctx.save();ctx.translate(x+17,y+22);ctx.scale(player.facing,1);
-  ctx.strokeStyle='#8b929e';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(10,3);ctx.lineTo(35,-18);ctx.stroke();
-  ctx.strokeStyle='#e5edf7';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(12,1);ctx.lineTo(36,-18);ctx.stroke();
-  ctx.strokeStyle='#8d633c';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(8,5);ctx.lineTo(15,12);ctx.stroke();
-  ctx.restore();ctx.restore();
-}
-function drawBoss(w,h){
-  const floor=h-105;
-  const x=scene==='castle'?0:boss.x;
-  if(scene==='castle')return;
-  // Large armored guardian
-  ctx.save();
-  ctx.fillStyle='#292d3a';
-  ctx.fillRect(x+12,floor-100,86,95);
-  ctx.fillStyle='#545c6d';
-  ctx.beginPath();ctx.arc(x+55,floor-122,48,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#858d9b';
-  ctx.beginPath();ctx.arc(x+55,floor-122,38,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#ff594c';
-  ctx.fillRect(x+31,floor-133,13,7);ctx.fillRect(x+66,floor-133,13,7);
-  ctx.fillStyle='#303745';ctx.fillRect(x+5,floor-55,100,18);
-  ctx.fillStyle='#a6adba';ctx.fillRect(x+35,floor-175,40,12);
-  // guardian sword
-  ctx.strokeStyle='#c8d2df';ctx.lineWidth=9;
-  ctx.beginPath();ctx.moveTo(x+100,floor-60);ctx.lineTo(x+145,floor-155);ctx.stroke();
-  ctx.restore();
+
+  const release = e => {
+    e.preventDefault();
+    input[key] = false;
+  };
+
+  button.addEventListener("pointerup", release);
+  button.addEventListener("pointercancel", release);
+
+  button.addEventListener("lostpointercapture", () => {
+    input[key] = false;
+  });
 }
 
-/* CONTROLS */
-function jump(){
-  if(running&&player.onGround&&scene!=='victory'){
-    player.vy=-465;player.onGround=false;
-  }
-}
-function bindHold(id,key){
-  const el=document.getElementById(id);
-  el.addEventListener('pointerdown',e=>{e.preventDefault();keys[key]=true;el.setPointerCapture(e.pointerId);});
-  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,()=>keys[key]=false));
-}
-bindHold('leftBtn','left');bindHold('rightBtn','right');
-document.getElementById('jumpBtn').addEventListener('pointerdown',e=>{e.preventDefault();jump();});
-window.addEventListener('keydown',e=>{
-  if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')keys.left=true;
-  if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')keys.right=true;
-  if(e.key==='ArrowUp'||e.key===' '||e.key.toLowerCase()==='w'){e.preventDefault();jump();}
-});
-window.addEventListener('keyup',e=>{
-  if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')keys.left=false;
-  if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')keys.right=false;
-});
+holdButton("leftButton", "left");
+holdButton("rightButton", "right");
+holdButton("jumpButton", "jump");
 
 /* SHOP */
-function openShop(){
-  const panel=document.getElementById('shopPanel');
-  panel.style.display='block';
-  document.getElementById('shopGems').textContent=gems;
-  const list=document.getElementById('shopItems');
-  list.innerHTML='';
-  Object.entries(skins).forEach(([id,item])=>{
-    const row=document.createElement('div');row.className='shopItem';
-    const info=document.createElement('span');
-    info.textContent=item.name+' — '+(item.price===0?'FREE':item.price+' gems');
-    const btn=document.createElement('button');
-    if(owned.includes(id)){
-      btn.textContent=equipped===id?'EQUIPPED':'EQUIP';
-      btn.onclick=()=>{
-        equipped=id;localStorage.setItem('tasEquipped',id);openShop();
-      };
-    }else{
-      btn.textContent='BUY';
-      btn.onclick=()=>{
-        if(gems<item.price){alert('Not enough gems yet!');return;}
-        gems-=item.price;owned.push(id);
-        localStorage.setItem('tasGems',String(gems));
-        localStorage.setItem('tasOwned',JSON.stringify(owned));
-        openShop();updateGemDisplay();
-      };
-    }
-    row.append(info,btn);list.appendChild(row);
-  });
+function openShop() {
+  gameActive = false;
+  cancelAnimationFrame(animationFrame);
+
+  document.getElementById("gameMenu").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("shopScreen").style.display = "flex";
+
+  updateGems();
 }
-function closeShop(){document.getElementById('shopPanel').style.display='none';}
-updateGemDisplay();
+
+function closeShop() {
+  document.getElementById("shopScreen").style.display = "none";
+
+  if (gameState === "playing") {
+    gameActive = true;
+    lastTime = performance.now();
+    animationFrame = requestAnimationFrame(gameLoop);
+  } else {
+    document.getElementById("gameMenu").style.display = "flex";
+  }
+}
+
+function buyItem(item, cost) {
+  if (!["gold", "blue", "silver"].includes(item)) return;
+
+  if (owned.includes(item)) {
+    alert("You already own this item!");
+    return;
+  }
+
+  if (gems < cost) {
+    alert("You need more gems!");
+    return;
+  }
+
+  gems -= cost;
+  owned.push(item);
+
+  try {
+    localStorage.setItem("tasOwned", JSON.stringify(owned));
+  } catch {}
+
+  applyOwnedItems();
+  updateGems();
+  drawGame();
+
+  alert("Item purchased!");
+}
+
+/* INITIALISE */
+updateGems();
+checkStatus();
+checkBan();
+
+setInterval(checkStatus, 5000);
 </script>
+
 </body>
 </html>
