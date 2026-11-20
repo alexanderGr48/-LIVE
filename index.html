@@ -3,283 +3,362 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#000000">
 <title>TAS LIVE</title>
 
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; }
 
 body {
-  background: #050505;
+  margin: 0;
+  background: #000;
   color: white;
   font-family: Arial, sans-serif;
-  min-height: 100vh;
   text-align: center;
 }
 
-header {
-  padding: 55px 20px 25px;
+button { font-family: inherit; cursor: pointer; }
+
+#home {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  padding: 12px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#picsButton {
+  margin-bottom: 35px;
+  padding: 12px 38px;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  border-radius: 10px;
+  font-size: 25px;
+  font-weight: bold;
 }
 
 h1 {
-  font-size: clamp(42px, 10vw, 75px);
-  font-weight: 900;
-  letter-spacing: 7px;
-  text-shadow: 0 0 25px #ff003c;
+  font-size: clamp(55px, 12vw, 130px);
+  letter-spacing: 8px;
+  margin: 0 0 20px;
 }
 
-.subtitle {
-  color: #888;
-  margin-top: 12px;
-  letter-spacing: 4px;
+#status {
+  font-size: clamp(32px, 7vw, 65px);
+  font-weight: bold;
+  margin: 20px 0;
 }
 
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  margin: 25px;
-  padding: 10px 18px;
-  border: 1px solid #333;
-  border-radius: 30px;
-  color: #aaa;
-  font-size: 13px;
+.live { color: #20e879; }
+.offline { color: #ff4545; }
+
+p {
+  color: #ccc;
+  font-size: clamp(18px, 3vw, 26px);
 }
 
-.dot {
-  width: 9px;
-  height: 9px;
-  background: #777;
-  border-radius: 50%;
-}
-
-.dot.live {
-  background: #00e676;
-  box-shadow: 0 0 12px #00e676;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  padding: 15px;
-}
-
-button, .tiktok {
-  border: 1px solid #333;
-  background: #111;
+#watchButton {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 22px 30px;
+  background: #fe2c55;
   color: white;
-  padding: 16px 28px;
+  text-decoration: none;
+  font-size: clamp(20px, 4vw, 36px);
+  font-weight: bold;
+  border-radius: 12px;
+}
+
+/* LOCK BUTTON */
+#lockButton {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 99999;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff2020;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
   font-size: 15px;
   font-weight: bold;
-  letter-spacing: 2px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: 0.2s;
-  text-decoration: none;
+  box-shadow: 0 0 16px rgba(255,32,32,.65);
 }
 
-button:hover, .tiktok:hover {
-  border-color: #ff003c;
-  color: #ff003c;
-  transform: translateY(-3px);
-}
+#lockButton:disabled { opacity: .5; }
 
-#pics {
+/* GALLERY */
+#gallery {
   display: none;
-  max-width: 1100px;
-  margin: 45px auto;
-  padding: 20px;
-}
-
-#pics h2 {
-  font-size: 30px;
-  letter-spacing: 5px;
-  margin-bottom: 25px;
-}
-
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-}
-
-.gallery img {
+  height: 100vh;
+  height: 100dvh;
   width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid #333;
+  overflow: hidden;
+  position: relative;
+  background: black;
 }
 
-#message {
-  color: #888;
-  margin: 20px;
+#photoGrid {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
 }
 
-.lock {
-  margin-top: 55px;
-  border-color: #ff003c;
-  color: #ff003c;
+#photoGrid img {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  background: black;
 }
 
-footer {
-  margin-top: 70px;
-  padding: 25px;
-  color: #555;
-  font-size: 12px;
-  letter-spacing: 2px;
+#closeGallery {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  padding: 10px 16px;
+  background: rgba(0,0,0,.8);
+  border: 1px solid white;
+  border-radius: 8px;
+  color: white;
+}
+
+#galleryMessage {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+@media(max-width:600px) {
+  #home { padding: 20px 14px 100px; }
+
+  #picsButton {
+    padding: 11px 30px;
+    font-size: 21px;
+  }
+
+  h1 { letter-spacing: 4px; }
+  #status { margin: 16px 0; }
+  #watchButton { padding: 20px 25px; }
+
+  #lockButton {
+    width: 68px;
+    height: 68px;
+    right: 14px;
+    bottom: 14px;
+  }
+}
+
+@media(max-width:600px) and (orientation:portrait) {
+  #photoGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3,minmax(0,1fr));
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header>
+<main id="home">
+  <button id="picsButton" onclick="openGallery()">PICS</button>
+
   <h1>TAS LIVE</h1>
-  <p class="subtitle">OFFICIAL WEBSITE</p>
+  <div id="status" class="offline">● OFFLINE</div>
+  <p id="message">TAS IS NOT LIVE RIGHT NOW.</p>
+  <p id="lastEnded"></p>
 
-  <div class="status">
-    <span class="dot" id="statusDot"></span>
-    <span id="statusText">CHECKING STATUS...</span>
-  </div>
-</header>
-
-<nav>
-  <button onclick="showPics()">PICS</button>
-
-  <a class="tiktok"
-     href="https://www.tiktok.com/"
-     target="_blank"
-     rel="noopener noreferrer">
-    TIKTOK
+  <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
+    VISIT TAS CHANNEL
   </a>
-</nav>
+</main>
 
-<section id="pics">
-  <h2>PHOTO GALLERY</h2>
-  <p id="message">Loading pictures...</p>
-  <div class="gallery" id="gallery"></div>
+<section id="gallery">
+  <button id="closeGallery" onclick="closeGallery()">← BACK</button>
+  <div id="photoGrid"></div>
+  <p id="galleryMessage">Loading photos...</p>
 </section>
 
-<button class="lock" id="lockButton" onclick="lockSite()">
-  🔒 LOCK
-</button>
-
-<footer>
-  TAS LIVE © 2026
-</footer>
+<button id="lockButton" onclick="lockVisitor()" disabled>LOCK</button>
 
 <script>
-const GITHUB_USER = "YOUR_GITHUB_USERNAME";
-const GITHUB_REPO = "YOUR_REPOSITORY";
-const GALLERY_FOLDER = "pics";
+"use strict";
 
-function showPics() {
-  const section = document.getElementById("pics");
+/* CONFIGURATION */
+const liveLink = "https://www.tiktok.com/@tasosanastasios/live";
+const channelLink = "https://www.tiktok.com/@tasosanastasios";
 
-  section.style.display =
-    section.style.display === "block" ? "none" : "block";
+const youtubeDestination =
+  "https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO";
 
-  if (section.style.display === "block") {
-    loadGallery();
+const photoFolder =
+  "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics";
+
+let banReady = false;
+
+/* TIKTOK STATUS */
+async function checkStatus() {
+  const status = document.getElementById("status");
+  const message = document.getElementById("message");
+  const lastEnded = document.getElementById("lastEnded");
+  const button = document.getElementById("watchButton");
+
+  try {
+    const response = await fetch("/status.json?t=" + Date.now(), {
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error("Status unavailable");
+
+    const data = await response.json();
+
+    if (data.live === true) {
+      status.textContent = "● LIVE NOW";
+      status.className = "live";
+      message.textContent = "TAS IS LIVE ON TIKTOK!";
+      button.textContent = "WATCH TAS LIVE";
+      button.href = liveLink;
+      lastEnded.textContent = "";
+    } else {
+      status.textContent = "● OFFLINE";
+      status.className = "offline";
+      message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
+      button.textContent = "VISIT TAS CHANNEL";
+      button.href = channelLink;
+
+      lastEnded.textContent = data.last_stream_ended
+        ? "LAST STREAM ENDED: " +
+          new Date(data.last_stream_ended).toLocaleString()
+        : "LAST STREAM ENDED: NOT AVAILABLE YET";
+    }
+  } catch {
+    status.textContent = "● OFFLINE";
+    status.className = "offline";
+    message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
+    button.textContent = "VISIT TAS CHANNEL";
+    button.href = channelLink;
+    lastEnded.textContent = "";
   }
 }
 
-async function loadGallery() {
-  const gallery = document.getElementById("gallery");
-  const message = document.getElementById("message");
-
-  if (
-    GITHUB_USER === "YOUR_GITHUB_USERNAME" ||
-    GITHUB_REPO === "YOUR_REPOSITORY"
-  ) {
-    message.textContent =
-      "Add your GitHub username and repository name in the code.";
-    return;
-  }
-
-  message.textContent = "Loading pictures...";
-  gallery.innerHTML = "";
+/* LOCK SYSTEM */
+async function checkBan() {
+  const lockButton = document.getElementById("lockButton");
 
   try {
-    const url =
-      `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GALLERY_FOLDER}`;
+    const response = await fetch("/api/ban", {
+      cache: "no-store"
+    });
 
-    const response = await fetch(url);
+    if (!response.ok) throw new Error("Ban status unavailable");
+
+    const data = await response.json();
+
+    if (data.banned) {
+      window.location.replace(youtubeDestination);
+      return;
+    }
+
+    banReady = true;
+    lockButton.disabled = false;
+  } catch {
+    banReady = false;
+    lockButton.disabled = true;
+  }
+}
+
+async function lockVisitor() {
+  if (!banReady) return;
+
+  const lockButton = document.getElementById("lockButton");
+  lockButton.disabled = true;
+
+  try {
+    const response = await fetch("/api/ban", {
+      method: "POST",
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error("Lock request failed");
+
+    window.location.replace(youtubeDestination);
+  } catch {
+    lockButton.disabled = false;
+  }
+}
+
+/* GALLERY */
+async function openGallery() {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("gallery").style.display = "block";
+
+  const grid = document.getElementById("photoGrid");
+  const message = document.getElementById("galleryMessage");
+
+  grid.innerHTML = "";
+  message.textContent = "Loading photos...";
+
+  try {
+    const response = await fetch(photoFolder + "?t=" + Date.now());
 
     if (!response.ok) throw new Error("Gallery unavailable");
 
     const files = await response.json();
 
-    const images = files.filter(file =>
-      /\.(png|jpe?g|gif|webp)$/i.test(file.name)
-    );
+    const photos = files
+      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .slice(0, 3);
 
-    if (images.length === 0) {
-      message.textContent = "No pictures found.";
+    if (!photos.length) {
+      message.textContent = "No photos uploaded yet.";
       return;
     }
 
-    message.textContent = "";
+    photos.forEach(file => {
+      if (!file.download_url) return;
 
-    images.forEach(file => {
       const img = document.createElement("img");
       img.src = file.download_url;
-      img.alt = file.name;
+      img.alt = "TAS photo";
       img.loading = "lazy";
-      gallery.appendChild(img);
+      grid.appendChild(img);
     });
 
-  } catch (error) {
-    message.textContent = "Could not load the gallery.";
-  }
-}
-
-async function updateStatus() {
-  try {
-    const response = await fetch(
-      "/status.json?t=" + Date.now(),
-      { cache: "no-store" }
-    );
-
-    if (!response.ok) throw new Error();
-
-    const data = await response.json();
-    const live = data.live === true;
-
-    document.getElementById("statusText").textContent =
-      live ? "LIVE NOW" : "OFFLINE";
-
-    document.getElementById("statusDot").classList.toggle(
-      "live",
-      live
-    );
+    message.textContent = grid.children.length
+      ? ""
+      : "No photos uploaded yet.";
 
   } catch {
-    document.getElementById("statusText").textContent =
-      "STATUS UNAVAILABLE";
+    message.textContent = "Could not load photos.";
   }
 }
 
-async function lockSite() {
-  const confirmed = confirm("Do you want to lock the site?");
-
-  if (!confirmed) return;
-
-  alert(
-    "Locking requires a secure server-side admin system. " +
-    "This button does not lock the website by itself."
-  );
+function closeGallery() {
+  document.getElementById("gallery").style.display = "none";
+  document.getElementById("home").style.display = "flex";
 }
 
-updateStatus();
-setInterval(updateStatus, 30000);
+/* INITIALISE */
+checkStatus();
+checkBan();
+
+setInterval(checkStatus, 5000);
 </script>
 
 </body>
