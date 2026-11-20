@@ -3,1423 +3,283 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="theme-color" content="#000000">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TAS LIVE</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  margin: 0;
-  background: #000;
+  background: #050505;
   color: white;
   font-family: Arial, sans-serif;
+  min-height: 100vh;
   text-align: center;
 }
 
-button { font-family: inherit; cursor: pointer; }
-
-#home {
-  min-height: 100vh;
-  min-height: 100dvh;
-  width: 100%;
-  padding: 12px 20px 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+header {
+  padding: 55px 20px 25px;
 }
-
-#gamesButton, #picsButton {
-  margin-bottom: 15px;
-  padding: 12px 38px;
-  background: transparent;
-  border: 2px solid white;
-  color: white;
-  border-radius: 10px;
-  font-size: 25px;
-  font-weight: bold;
-}
-
-#picsButton { margin-bottom: 35px; }
 
 h1 {
-  font-size: clamp(55px, 12vw, 130px);
-  letter-spacing: 8px;
-  margin: 0 0 20px;
+  font-size: clamp(42px, 10vw, 75px);
+  font-weight: 900;
+  letter-spacing: 7px;
+  text-shadow: 0 0 25px #ff003c;
 }
 
-#status {
-  font-size: clamp(32px, 7vw, 65px);
-  font-weight: bold;
-  margin: 20px 0;
+.subtitle {
+  color: #888;
+  margin-top: 12px;
+  letter-spacing: 4px;
 }
 
-.live { color: #20e879; }
-.offline { color: #ff4545; }
-
-p {
-  color: #ccc;
-  font-size: clamp(18px, 3vw, 26px);
-}
-
-#watchButton {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 22px 30px;
-  background: #fe2c55;
-  color: white;
-  text-decoration: none;
-  font-size: clamp(20px, 4vw, 36px);
-  font-weight: bold;
-  border-radius: 12px;
-}
-
-/* LOCK BUTTON */
-#lockButton {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 99999;
-  width: 76px;
-  height: 76px;
-  padding: 0;
-  display: flex;
+.status {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  background: #ff2020;
-  color: white;
-  border: 2px solid white;
+  gap: 9px;
+  margin: 25px;
+  padding: 10px 18px;
+  border: 1px solid #333;
+  border-radius: 30px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  background: #777;
   border-radius: 50%;
+}
+
+.dot.live {
+  background: #00e676;
+  box-shadow: 0 0 12px #00e676;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 15px;
+}
+
+button, .tiktok {
+  border: 1px solid #333;
+  background: #111;
+  color: white;
+  padding: 16px 28px;
   font-size: 15px;
   font-weight: bold;
-  box-shadow: 0 0 16px rgba(255,32,32,.65);
-}
-
-#lockButton:disabled { opacity: .5; }
-
-/* GALLERY */
-#gallery {
-  display: none;
-  height: 100vh;
-  height: 100dvh;
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  background: black;
-}
-
-#photoGrid {
-  height: 100%;
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
-}
-
-#photoGrid img {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  object-fit: contain;
-  background: black;
-}
-
-#closeGallery {
-  position: absolute;
-  z-index: 2;
-  top: 10px;
-  left: 10px;
-  padding: 10px 16px;
-  background: rgba(0,0,0,.8);
-  border: 1px solid white;
+  letter-spacing: 2px;
+  cursor: pointer;
   border-radius: 8px;
-  color: white;
+  transition: 0.2s;
+  text-decoration: none;
 }
 
-#galleryMessage {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
+button:hover, .tiktok:hover {
+  border-color: #ff003c;
+  color: #ff003c;
+  transform: translateY(-3px);
 }
 
-/* GAME */
-#gameScreen {
+#pics {
   display: none;
-  position: fixed;
-  inset: 0;
-  background: #090b12;
-  z-index: 20;
-  overflow: hidden;
-}
-
-#gameTop {
-  height: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px 12px;
-  background: #11151e;
-  border-bottom: 1px solid #424956;
-  gap: 8px;
-}
-
-.gameTopButton {
-  background: #292f3c;
-  border: 1px solid #777;
-  color: white;
-  padding: 8px 13px;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-#gemCount {
-  color: #ffd65a;
-  font-weight: bold;
-}
-
-#gameCanvas {
-  display: block;
-  width: 100%;
-  height: calc(100% - 155px);
-  background: #242d40;
-  touch-action: none;
-}
-
-#gameControls {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: #11151e;
-  padding: 8px 12px;
-  gap: 12px;
-}
-
-.controlButton {
-  flex: 1;
-  max-width: 180px;
-  height: 76px;
-  background: linear-gradient(#414b60,#202736);
-  color: white;
-  border: 2px solid #8793a6;
-  border-radius: 15px;
-  font-size: 21px;
-  font-weight: bold;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.controlButton:active {
-  background: #65738b;
-  transform: scale(.96);
-}
-
-/* GAME MENU AND SHOP */
-#gameMenu, #shopScreen, #resultScreen {
-  position: absolute;
-  inset: 55px 0 0;
-  z-index: 5;
-  display: none;
-  background: rgba(5,8,15,.96);
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  max-width: 1100px;
+  margin: 45px auto;
   padding: 20px;
-  overflow-y: auto;
 }
 
-#gameMenu h2, #shopScreen h2, #resultScreen h2 {
-  font-size: clamp(30px,6vw,55px);
-  margin: 10px;
+#pics h2 {
+  font-size: 30px;
+  letter-spacing: 5px;
+  margin-bottom: 25px;
 }
 
-.gameDescription {
-  max-width: 500px;
-  line-height: 1.5;
-  font-size: 17px;
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
 }
 
-.menuButton {
-  display: block;
-  min-width: 190px;
-  margin: 9px;
-  padding: 15px 22px;
-  background: #76502e;
-  color: white;
-  border: 2px solid #c9a16b;
+.gallery img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
   border-radius: 10px;
-  font-size: 19px;
-  font-weight: bold;
+  border: 1px solid #333;
 }
 
-.shopItem {
-  width: min(330px,90%);
-  padding: 14px;
-  margin: 8px;
-  background: #202735;
-  border: 1px solid #707b8d;
-  border-radius: 10px;
+#message {
+  color: #888;
+  margin: 20px;
 }
 
-.shopItem button {
-  margin-top: 8px;
-  padding: 9px 20px;
-  background: #b17a36;
-  color: white;
-  border: 0;
-  border-radius: 7px;
-  font-weight: bold;
+.lock {
+  margin-top: 55px;
+  border-color: #ff003c;
+  color: #ff003c;
 }
 
-@media(max-width:600px) {
-  #home { padding: 20px 14px 100px; }
-
-  #gamesButton, #picsButton {
-    padding: 11px 30px;
-    font-size: 21px;
-  }
-
-  h1 { letter-spacing: 4px; }
-  #status { margin: 16px 0; }
-  #watchButton { padding: 20px 25px; }
-
-  #lockButton {
-    width: 68px;
-    height: 68px;
-    right: 14px;
-    bottom: 14px;
-  }
-}
-
-@media(max-width:600px) and (orientation:portrait) {
-  #photoGrid {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(3,minmax(0,1fr));
-  }
-}
-
-@media(max-height:500px) and (orientation:landscape) {
-  #gameCanvas { height: calc(100% - 125px); }
-  #gameControls { height: 70px; }
-  .controlButton { height: 55px; }
-  #gameTop { height: 45px; }
+footer {
+  margin-top: 70px;
+  padding: 25px;
+  color: #555;
+  font-size: 12px;
+  letter-spacing: 2px;
 }
 </style>
 </head>
 
 <body>
 
-<main id="home">
-  <button id="gamesButton" onclick="openGame()">GAMES</button>
-  <button id="picsButton" onclick="openGallery()">PICS</button>
-
+<header>
   <h1>TAS LIVE</h1>
-  <div id="status" class="offline">● OFFLINE</div>
-  <p id="message">TAS IS NOT LIVE RIGHT NOW.</p>
-  <p id="lastEnded"></p>
+  <p class="subtitle">OFFICIAL WEBSITE</p>
 
-  <a id="watchButton" href="https://www.tiktok.com/@tasosanastasios">
-    VISIT TAS CHANNEL
+  <div class="status">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">CHECKING STATUS...</span>
+  </div>
+</header>
+
+<nav>
+  <button onclick="showPics()">PICS</button>
+
+  <a class="tiktok"
+     href="https://www.tiktok.com/"
+     target="_blank"
+     rel="noopener noreferrer">
+    TIKTOK
   </a>
-</main>
+</nav>
 
-<section id="gallery">
-  <button id="closeGallery" onclick="closeGallery()">← BACK</button>
-  <div id="photoGrid"></div>
-  <p id="galleryMessage">Loading photos...</p>
+<section id="pics">
+  <h2>PHOTO GALLERY</h2>
+  <p id="message">Loading pictures...</p>
+  <div class="gallery" id="gallery"></div>
 </section>
 
-<section id="gameScreen">
+<button class="lock" id="lockButton" onclick="lockSite()">
+  🔒 LOCK
+</button>
 
-  <div id="gameTop">
-    <button class="gameTopButton" onclick="leaveGame()">← EXIT</button>
-    <div id="gemCount">💎 0</div>
-    <button class="gameTopButton" onclick="openShop()">SHOP</button>
-  </div>
-
-  <canvas id="gameCanvas"></canvas>
-
-  <div id="gameControls">
-    <button class="controlButton" id="leftButton">◀ LEFT</button>
-    <button class="controlButton" id="rightButton">RIGHT ▶</button>
-    <button class="controlButton" id="jumpButton">▲ JUMP</button>
-  </div>
-
-  <div id="gameMenu">
-    <h2>TAS: CASTLE ESCAPE</h2>
-    <p class="gameDescription">
-      Escape through the medieval castle. Complete the parkour,
-      solve the switches and defeat the castle boss.
-    </p>
-    <button class="menuButton" onclick="startGame()">PLAY</button>
-    <button class="menuButton" onclick="openShop()">ITEM SHOP</button>
-    <button class="menuButton" onclick="leaveGame()">EXIT GAME</button>
-  </div>
-
-  <div id="shopScreen">
-    <h2>ITEM SHOP</h2>
-    <p>💎 Your gems: <span id="shopGems">0</span></p>
-
-    <div class="shopItem">
-      <strong>Golden Ball</strong>
-      <p>Change your ball to gold.</p>
-      <button onclick="buyItem('gold',30)">BUY — 30 💎</button>
-    </div>
-
-    <div class="shopItem">
-      <strong>Blue Ball</strong>
-      <p>Change your ball to blue.</p>
-      <button onclick="buyItem('blue',40)">BUY — 40 💎</button>
-    </div>
-
-    <div class="shopItem">
-      <strong>Silver Sword</strong>
-      <p>Change your sword's appearance.</p>
-      <button onclick="buyItem('silver',25)">BUY — 25 💎</button>
-    </div>
-
-    <button class="menuButton" onclick="closeShop()">BACK</button>
-  </div>
-
-  <div id="resultScreen">
-    <h2 id="resultTitle">VICTORY!</h2>
-    <p id="resultMessage">You defeated the boss!</p>
-    <button class="menuButton" onclick="startGame()">PLAY AGAIN</button>
-    <button class="menuButton" onclick="openShop()">ITEM SHOP</button>
-    <button class="menuButton" onclick="leaveGame()">EXIT</button>
-  </div>
-
-</section>
-
-<button id="lockButton" onclick="lockVisitor()" disabled>LOCK</button>
+<footer>
+  TAS LIVE © 2026
+</footer>
 
 <script>
-"use strict";
+const GITHUB_USER = "YOUR_GITHUB_USERNAME";
+const GITHUB_REPO = "YOUR_REPOSITORY";
+const GALLERY_FOLDER = "pics";
 
-/* CONFIGURATION */
-const liveLink = "https://www.tiktok.com/@tasosanastasios/live";
-const channelLink = "https://www.tiktok.com/@tasosanastasios";
-const youtubeDestination =
-  "https://youtube.com/shorts/Yt_F2odTgPA?si=d0U5hcmywHO6cpaO";
+function showPics() {
+  const section = document.getElementById("pics");
 
-const photoFolder =
-  "https://api.github.com/repos/alexanderGr48/-LIVE/contents/pics";
+  section.style.display =
+    section.style.display === "block" ? "none" : "block";
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-let banReady = false;
-
-/* SAFE LOCAL STORAGE */
-function loadNumber(key, fallback) {
-  try {
-    const value = Number(localStorage.getItem(key));
-    return Number.isFinite(value) && value >= 0 ? value : fallback;
-  } catch {
-    return fallback;
+  if (section.style.display === "block") {
+    loadGallery();
   }
 }
 
-function loadOwned() {
-  try {
-    const data = JSON.parse(localStorage.getItem("tasOwned") || "[]");
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
-}
-
-/* TIKTOK STATUS */
-async function checkStatus() {
-  const status = document.getElementById("status");
+async function loadGallery() {
+  const gallery = document.getElementById("gallery");
   const message = document.getElementById("message");
-  const lastEnded = document.getElementById("lastEnded");
-  const button = document.getElementById("watchButton");
 
-  try {
-    const response = await fetch("/status.json?t=" + Date.now(), {
-      cache: "no-store"
-    });
-
-    if (!response.ok) throw new Error("Status unavailable");
-
-    const data = await response.json();
-
-    if (data.live === true) {
-      status.textContent = "● LIVE NOW";
-      status.className = "live";
-      message.textContent = "TAS IS LIVE ON TIKTOK!";
-      button.textContent = "WATCH TAS LIVE";
-      button.href = liveLink;
-      lastEnded.textContent = "";
-    } else {
-      status.textContent = "● OFFLINE";
-      status.className = "offline";
-      message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
-      button.textContent = "VISIT TAS CHANNEL";
-      button.href = channelLink;
-
-      lastEnded.textContent = data.last_stream_ended
-        ? "LAST STREAM ENDED: " +
-          new Date(data.last_stream_ended).toLocaleString()
-        : "LAST STREAM ENDED: NOT AVAILABLE YET";
-    }
-  } catch {
-    status.textContent = "● OFFLINE";
-    status.className = "offline";
-    message.textContent = "TAS IS NOT LIVE RIGHT NOW.";
-    button.textContent = "VISIT TAS CHANNEL";
-    button.href = channelLink;
-    lastEnded.textContent = "";
+  if (
+    GITHUB_USER === "YOUR_GITHUB_USERNAME" ||
+    GITHUB_REPO === "YOUR_REPOSITORY"
+  ) {
+    message.textContent =
+      "Add your GitHub username and repository name in the code.";
+    return;
   }
-}
 
-/* LOCK SYSTEM */
-async function checkBan() {
-  const lockButton = document.getElementById("lockButton");
+  message.textContent = "Loading pictures...";
+  gallery.innerHTML = "";
 
   try {
-    const response = await fetch("/api/ban", {
-      cache: "no-store"
-    });
+    const url =
+      `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GALLERY_FOLDER}`;
 
-    if (!response.ok) throw new Error("Ban status unavailable");
-
-    const data = await response.json();
-
-    if (data.banned) {
-      window.location.replace(youtubeDestination);
-      return;
-    }
-
-    banReady = true;
-    lockButton.disabled = false;
-  } catch {
-    banReady = false;
-    lockButton.disabled = true;
-  }
-}
-
-async function lockVisitor() {
-  if (!banReady) return;
-
-  const lockButton = document.getElementById("lockButton");
-  lockButton.disabled = true;
-
-  try {
-    const response = await fetch("/api/ban", {
-      method: "POST",
-      cache: "no-store"
-    });
-
-    if (!response.ok) throw new Error("Lock request failed");
-
-    window.location.replace(youtubeDestination);
-  } catch {
-    lockButton.disabled = false;
-  }
-}
-
-/* GALLERY */
-async function openGallery() {
-  document.getElementById("home").style.display = "none";
-  document.getElementById("gallery").style.display = "block";
-
-  const grid = document.getElementById("photoGrid");
-  const message = document.getElementById("galleryMessage");
-
-  grid.innerHTML = "";
-  message.textContent = "Loading photos...";
-
-  try {
-    const response = await fetch(photoFolder + "?t=" + Date.now());
+    const response = await fetch(url);
 
     if (!response.ok) throw new Error("Gallery unavailable");
 
     const files = await response.json();
 
-    const photos = files
-      .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name))
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .slice(0, 3);
+    const images = files.filter(file =>
+      /\.(png|jpe?g|gif|webp)$/i.test(file.name)
+    );
 
-    if (!photos.length) {
-      message.textContent = "No photos uploaded yet.";
+    if (images.length === 0) {
+      message.textContent = "No pictures found.";
       return;
     }
 
-    photos.forEach(file => {
-      if (!file.download_url) return;
+    message.textContent = "";
 
+    images.forEach(file => {
       const img = document.createElement("img");
       img.src = file.download_url;
-      img.alt = "TAS photo";
+      img.alt = file.name;
       img.loading = "lazy";
-      grid.appendChild(img);
+      gallery.appendChild(img);
     });
 
-    message.textContent = grid.children.length
-      ? ""
-      : "No photos uploaded yet.";
+  } catch (error) {
+    message.textContent = "Could not load the gallery.";
+  }
+}
+
+async function updateStatus() {
+  try {
+    const response = await fetch(
+      "/status.json?t=" + Date.now(),
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) throw new Error();
+
+    const data = await response.json();
+    const live = data.live === true;
+
+    document.getElementById("statusText").textContent =
+      live ? "LIVE NOW" : "OFFLINE";
+
+    document.getElementById("statusDot").classList.toggle(
+      "live",
+      live
+    );
 
   } catch {
-    message.textContent = "Could not load photos.";
+    document.getElementById("statusText").textContent =
+      "STATUS UNAVAILABLE";
   }
 }
 
-function closeGallery() {
-  document.getElementById("gallery").style.display = "none";
-  document.getElementById("home").style.display = "flex";
-}
+async function lockSite() {
+  const confirmed = confirm("Do you want to lock the site?");
 
-/* GAME STATE */
-let gameActive = false;
-let gameState = "menu";
-let animationFrame = null;
-let lastTime = 0;
-let cameraX = 0;
+  if (!confirmed) return;
 
-let gems = loadNumber("tasGems", 0);
-let owned = loadOwned();
-
-let ballColor = "#e5e8ee";
-let swordColor = "#cbd5e1";
-
-const input = {
-  left: false,
-  right: false,
-  jump: false
-};
-
-const world = {
-  width: 3200,
-  ground: 470
-};
-
-let player = null;
-let boss = null;
-let switches = [];
-let gate = null;
-let bossStarted = false;
-let rewardGiven = false;
-
-/* RESTORE PURCHASED ITEMS */
-function applyOwnedItems() {
-  ballColor = "#e5e8ee";
-  swordColor = "#cbd5e1";
-
-  if (owned.includes("gold")) ballColor = "#e8b83f";
-  if (owned.includes("blue")) ballColor = "#3998e8";
-  if (owned.includes("silver")) swordColor = "#e8edf5";
-}
-
-applyOwnedItems();
-
-/* GEM DISPLAY */
-function updateGems() {
-  document.getElementById("gemCount").textContent = "💎 " + gems;
-  document.getElementById("shopGems").textContent = gems;
-
-  try {
-    localStorage.setItem("tasGems", String(gems));
-  } catch {}
-}
-
-/* GAME NAVIGATION */
-function openGame() {
-  document.getElementById("home").style.display = "none";
-  document.getElementById("gameScreen").style.display = "block";
-  document.getElementById("gameMenu").style.display = "flex";
-  document.getElementById("shopScreen").style.display = "none";
-  document.getElementById("resultScreen").style.display = "none";
-
-  gameState = "menu";
-  resizeCanvas();
-  updateGems();
-  drawGame();
-}
-
-function leaveGame() {
-  gameActive = false;
-  cancelAnimationFrame(animationFrame);
-  animationFrame = null;
-
-  input.left = false;
-  input.right = false;
-  input.jump = false;
-
-  document.getElementById("gameScreen").style.display = "none";
-  document.getElementById("home").style.display = "flex";
-}
-
-/* CANVAS SIZE */
-function resizeCanvas() {
-  const rect = canvas.getBoundingClientRect();
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  drawGame();
-}
-
-window.addEventListener("resize", () => {
-  if (document.getElementById("gameScreen").style.display === "block") {
-    resizeCanvas();
-  }
-});
-
-/* WORLD OBJECTS */
-const platforms = [
-  {x:330,y:390,w:150,h:22},
-  {x:550,y:330,w:145,h:22},
-  {x:760,y:390,w:150,h:22},
-  {x:1040,y:380,w:150,h:22},
-  {x:1250,y:320,w:160,h:22},
-  {x:1490,y:380,w:150,h:22},
-  {x:1770,y:370,w:150,h:22},
-  {x:1970,y:315,w:160,h:22},
-  {x:2330,y:390,w:140,h:22},
-  {x:2510,y:340,w:150,h:22}
-];
-
-const hazards = [
-  {x:490,w:55},
-  {x:920,w:70},
-  {x:1410,w:65},
-  {x:1920,w:65},
-  {x:2440,w:55}
-];
-
-/* START GAME */
-function startGame() {
-  document.getElementById("gameMenu").style.display = "none";
-  document.getElementById("shopScreen").style.display = "none";
-  document.getElementById("resultScreen").style.display = "none";
-
-  player = {
-    x: 60,
-    y: world.ground - 35,
-    vx: 0,
-    vy: 0,
-    r: 24,
-    health: 3,
-    onGround: true,
-    facing: 1,
-    attackCooldown: 0,
-    invulnerable: 0
-  };
-
-  boss = {
-    x: 2780,
-    y: world.ground - 65,
-    health: 5,
-    maxHealth: 5,
-    attackTimer: 1.5,
-    flash: 0
-  };
-
-  switches = [
-    {x:850,active:false},
-    {x:1730,active:false}
-  ];
-
-  gate = {
-    x: 2250,
-    open: false
-  };
-
-  cameraX = 0;
-  bossStarted = false;
-  rewardGiven = false;
-
-  gameState = "playing";
-  gameActive = true;
-  lastTime = performance.now();
-
-  input.left = false;
-  input.right = false;
-  input.jump = false;
-
-  cancelAnimationFrame(animationFrame);
-  animationFrame = requestAnimationFrame(gameLoop);
-}
-
-/* MAIN GAME LOOP */
-function gameLoop(now) {
-  if (!gameActive) return;
-
-  const dt = Math.min((now - lastTime) / 1000, 0.035);
-  lastTime = now;
-
-  updateGame(dt);
-  drawGame();
-
-  if (gameActive) {
-    animationFrame = requestAnimationFrame(gameLoop);
-  }
-}
-
-/* UPDATE GAME */
-function updateGame(dt) {
-  if (gameState !== "playing" || !player) return;
-
-  const speed = 260;
-
-  player.vx = 0;
-
-  if (input.left) {
-    player.vx = -speed;
-    player.facing = -1;
-  }
-
-  if (input.right) {
-    player.vx = speed;
-    player.facing = 1;
-  }
-
-  if (input.jump && player.onGround) {
-    player.vy = -570;
-    player.onGround = false;
-  }
-
-  player.x += player.vx * dt;
-  player.x = Math.max(20, Math.min(world.width - 30, player.x));
-
-  const oldY = player.y;
-
-  player.vy += 1450 * dt;
-  player.y += player.vy * dt;
-  player.onGround = false;
-
-  if (player.y + player.r >= world.ground) {
-    player.y = world.ground - player.r;
-    player.vy = 0;
-    player.onGround = true;
-  }
-
-  /* PLATFORM COLLISION */
-  for (const p of platforms) {
-    const overlaps =
-      player.x + player.r > p.x &&
-      player.x - player.r < p.x + p.w;
-
-    if (
-      overlaps &&
-      player.vy >= 0 &&
-      oldY + player.r <= p.y + 8 &&
-      player.y + player.r >= p.y
-    ) {
-      player.y = p.y - player.r;
-      player.vy = 0;
-      player.onGround = true;
-    }
-  }
-
-  /* SWITCHES */
-  for (const sw of switches) {
-    if (
-      !sw.active &&
-      Math.abs(player.x - sw.x) < 42 &&
-      player.y > world.ground - 100
-    ) {
-      sw.active = true;
-    }
-  }
-
-  gate.open = switches.every(sw => sw.active);
-
-  /* GATE */
-  if (
-    !gate.open &&
-    player.x + player.r > gate.x &&
-    player.x < gate.x + 20
-  ) {
-    player.x = gate.x - player.r;
-  }
-
-  /* HAZARDS */
-  for (const h of hazards) {
-    if (
-      player.x + player.r > h.x &&
-      player.x - player.r < h.x + h.w &&
-      player.y + player.r >= world.ground - 8
-    ) {
-      hurtPlayer();
-      if (!gameActive) return;
-    }
-  }
-
-  player.attackCooldown = Math.max(0, player.attackCooldown - dt);
-  player.invulnerable = Math.max(0, player.invulnerable - dt);
-  boss.flash = Math.max(0, boss.flash - dt);
-
-  /* BOSS */
-  if (player.x > 2580) bossStarted = true;
-
-  if (bossStarted && boss.health > 0) {
-    const distance = Math.abs(player.x - boss.x);
-
-    if (
-      distance < 125 &&
-      player.attackCooldown <= 0 &&
-      Math.abs(player.y - boss.y) < 100
-    ) {
-      boss.health--;
-      boss.flash = 0.25;
-      player.attackCooldown = 0.65;
-    }
-
-    boss.attackTimer -= dt;
-
-    if (boss.attackTimer <= 0) {
-      boss.attackTimer = 2.1;
-
-      if (distance < 180 && player.invulnerable <= 0) {
-        if (player.onGround) {
-          hurtPlayer();
-          if (!gameActive) return;
-        }
-      }
-    }
-
-    if (boss.health <= 0 && !rewardGiven) {
-      rewardGiven = true;
-      gems += 50;
-      updateGems();
-      finishGame(true);
-      return;
-    }
-  }
-
-  /* CAMERA
-     The game world uses a logical width of 1000 units. */
-  const logicalViewWidth = 1000;
-
-  cameraX = Math.max(
-    0,
-    Math.min(
-      world.width - logicalViewWidth,
-      player.x - logicalViewWidth * 0.35
-    )
+  alert(
+    "Locking requires a secure server-side admin system. " +
+    "This button does not lock the website by itself."
   );
-
-  if (player.y > 650) hurtPlayer();
 }
 
-/* PLAYER DAMAGE */
-function hurtPlayer() {
-  if (!player || player.invulnerable > 0) return;
-
-  player.health--;
-  player.invulnerable = 1.2;
-
-  if (player.health <= 0) {
-    finishGame(false);
-  } else {
-    player.y = world.ground - player.r;
-    player.vy = -220;
-  }
-}
-
-/* GAME RESULT */
-function finishGame(won) {
-  gameActive = false;
-  gameState = won ? "won" : "lost";
-
-  document.getElementById("resultTitle").textContent =
-    won ? "VICTORY!" : "TRY AGAIN";
-
-  document.getElementById("resultMessage").textContent =
-    won
-      ? "You defeated the castle boss and earned 50 gems!"
-      : "Your adventure ended. Try the castle again!";
-
-  document.getElementById("resultScreen").style.display = "flex";
-  updateGems();
-}
-
-/* DRAW GAME */
-function drawGame() {
-  if (!canvas.width || !canvas.height) return;
-
-  const W = canvas.clientWidth;
-  const H = canvas.clientHeight;
-
-  if (!W || !H) return;
-
-  ctx.clearRect(0, 0, W, H);
-
-  ctx.save();
-  ctx.scale(W / 1000, H / 560);
-  ctx.translate(-cameraX, 0);
-
-  /* SKY */
-  const sky = ctx.createLinearGradient(0, 0, 0, 560);
-  sky.addColorStop(0, "#19263c");
-  sky.addColorStop(0.65, "#536078");
-  sky.addColorStop(1, "#bd9270");
-
-  ctx.fillStyle = sky;
-  ctx.fillRect(cameraX, 0, 1100, 560);
-
-  /* DISTANT CASTLE */
-  ctx.fillStyle = "#293246";
-
-  for (let i = 0; i < 9; i++) {
-    const x = cameraX - 100 + i * 180;
-
-    ctx.fillRect(x, 170, 125, 300);
-    ctx.fillRect(x + 25, 125, 30, 45);
-    ctx.fillRect(x + 75, 105, 30, 65);
-
-    ctx.fillStyle = "#1c2637";
-    ctx.beginPath();
-    ctx.moveTo(x + 20, 125);
-    ctx.lineTo(x + 40, 80);
-    ctx.lineTo(x + 60, 125);
-    ctx.fill();
-
-    ctx.fillStyle = "#293246";
-  }
-
-  /* STONE WALL */
-  const wall = ctx.createLinearGradient(0, 250, 0, 480);
-  wall.addColorStop(0, "#77716c");
-  wall.addColorStop(1, "#35363d");
-
-  ctx.fillStyle = wall;
-  ctx.fillRect(cameraX, 300, 3400, 180);
-
-  for (
-    let x = Math.floor(cameraX / 100) * 100;
-    x < cameraX + 1100;
-    x += 100
-  ) {
-    ctx.strokeStyle = "rgba(15,18,25,.35)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, 310, 100, 55);
-    ctx.strokeRect(x - 50, 365, 100, 55);
-    ctx.strokeRect(x, 420, 100, 50);
-  }
-
-  /* GROUND */
-  const ground = ctx.createLinearGradient(0, 450, 0, 510);
-  ground.addColorStop(0, "#716052");
-  ground.addColorStop(1, "#28252a");
-
-  ctx.fillStyle = ground;
-  ctx.fillRect(cameraX, world.ground, 3400, 100);
-
-  ctx.fillStyle = "#9b866d";
-  ctx.fillRect(cameraX, world.ground, 3400, 7);
-
-  /* WINDOWS */
-  for (let x = 150; x < 3300; x += 360) {
-    ctx.fillStyle = "#18253c";
-    ctx.beginPath();
-    ctx.arc(x, 260, 24, Math.PI, 0);
-    ctx.lineTo(x + 24, 300);
-    ctx.lineTo(x - 24, 300);
-    ctx.fill();
-
-    ctx.strokeStyle = "#b49a74";
-    ctx.lineWidth = 5;
-    ctx.stroke();
-
-    ctx.fillStyle = "rgba(255,190,95,.2)";
-    ctx.fillRect(x - 4, 260, 8, 40);
-  }
-
-  /* PLATFORMS */
-  for (const p of platforms) {
-    ctx.fillStyle = "#514b48";
-    ctx.fillRect(p.x, p.y, p.w, p.h);
-
-    ctx.fillStyle = "#a08b72";
-    ctx.fillRect(p.x, p.y, p.w, 6);
-
-    ctx.strokeStyle = "#292a30";
-    ctx.strokeRect(p.x, p.y, p.w, p.h);
-  }
-
-  /* HAZARDS */
-  for (const h of hazards) {
-    ctx.fillStyle = "#303039";
-    ctx.fillRect(h.x, world.ground - 13, h.w, 13);
-
-    ctx.fillStyle = "#b7a18a";
-
-    for (let i = 0; i < 3; i++) {
-      ctx.beginPath();
-      ctx.moveTo(h.x + i * 20, world.ground - 13);
-      ctx.lineTo(h.x + 10 + i * 20, world.ground - 35);
-      ctx.lineTo(h.x + 20 + i * 20, world.ground - 13);
-      ctx.fill();
-    }
-  }
-
-  /* SWITCHES */
-  for (const sw of switches) {
-    ctx.fillStyle = sw.active ? "#36e68a" : "#c58b38";
-    ctx.fillRect(sw.x - 14, world.ground - 22, 28, 22);
-
-    ctx.fillStyle = "#fff2c0";
-    ctx.beginPath();
-    ctx.arc(sw.x, world.ground - 24, 8, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  /* GATE */
-  if (gate && !gate.open) {
-    ctx.fillStyle = "#24232a";
-    ctx.fillRect(gate.x, 260, 28, 210);
-
-    ctx.strokeStyle = "#b89a6e";
-    ctx.lineWidth = 5;
-
-    for (let i = 0; i < 4; i++) {
-      ctx.beginPath();
-      ctx.moveTo(gate.x + i * 9, 260);
-      ctx.lineTo(gate.x + i * 9, 470);
-      ctx.stroke();
-    }
-  } else if (gate && gate.open) {
-    ctx.fillStyle = "#36d68b";
-    ctx.font = "bold 22px Arial";
-    ctx.fillText("GATE OPEN", gate.x - 25, 245);
-  }
-
-  /* TORCHES */
-  for (let x = 200; x < 3200; x += 420) {
-    ctx.fillStyle = "#372b27";
-    ctx.fillRect(x, 220, 8, 35);
-
-    ctx.fillStyle = "#ff9d32";
-    ctx.beginPath();
-    ctx.arc(x + 4, 215, 10, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = "rgba(255,145,30,.16)";
-    ctx.beginPath();
-    ctx.arc(x + 4, 215, 35, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  /* BOSS AND PLAYER */
-  if (boss && (bossStarted || (player && player.x > 2450))) {
-    drawBoss();
-  }
-
-  if (player) drawPlayer();
-
-  ctx.restore();
-
-  /* HUD */
-  ctx.save();
-  ctx.scale(W / 1000, H / 560);
-
-  ctx.fillStyle = "rgba(0,0,0,.6)";
-  ctx.fillRect(12, 12, 260, 65);
-
-  ctx.fillStyle = "white";
-  ctx.font = "bold 19px Arial";
-  ctx.fillText("CASTLE ESCAPE", 24, 38);
-
-  ctx.font = "16px Arial";
-  ctx.fillText(
-    "♥ ".repeat(Math.max(0, player ? player.health : 3)),
-    24,
-    63
-  );
-
-  if (bossStarted && boss && boss.health > 0) {
-    ctx.fillStyle = "rgba(0,0,0,.7)";
-    ctx.fillRect(350, 15, 300, 45);
-
-    ctx.fillStyle = "#e74c4c";
-    ctx.fillRect(
-      365,
-      42,
-      270 * (boss.health / boss.maxHealth),
-      8
-    );
-
-    ctx.fillStyle = "white";
-    ctx.font = "bold 17px Arial";
-    ctx.fillText("CASTLE BOSS", 450, 34);
-  }
-
-  if (switches.length) {
-    ctx.fillStyle = "white";
-    ctx.font = "15px Arial";
-    ctx.fillText(
-      "SWITCHES: " +
-      switches.filter(sw => sw.active).length +
-      "/2",
-      24,
-      98
-    );
-  }
-
-  ctx.restore();
-}
-
-/* DRAW PLAYER */
-function drawPlayer() {
-  if (!player) return;
-
-  ctx.save();
-  ctx.translate(player.x, player.y);
-
-  if (
-    player.invulnerable > 0 &&
-    Math.floor(player.invulnerable * 12) % 2 === 0
-  ) {
-    ctx.globalAlpha = 0.35;
-  }
-
-  /* SWORD */
-  ctx.save();
-  ctx.rotate(player.facing === 1 ? -0.5 : Math.PI + 0.5);
-
-  ctx.fillStyle = "#77502c";
-  ctx.fillRect(15, -3, 20, 7);
-
-  ctx.fillStyle = swordColor;
-  ctx.fillRect(30, -5, 42, 5);
-
-  ctx.fillStyle = "#f0e2c3";
-  ctx.fillRect(29, -10, 5, 16);
-  ctx.restore();
-
-  /* BALL */
-  const ball = ctx.createRadialGradient(-9, -12, 3, 0, 0, 29);
-  ball.addColorStop(0, "#ffffff");
-  ball.addColorStop(0.4, ballColor);
-  ball.addColorStop(1, "#68717d");
-
-  ctx.fillStyle = ball;
-  ctx.beginPath();
-  ctx.arc(0, 0, 24, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = "#303746";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  /* FACE */
-  ctx.fillStyle = "#18202b";
-  ctx.beginPath();
-  ctx.arc(-8, -5, 3, 0, Math.PI * 2);
-  ctx.arc(8, -5, 3, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = "#18202b";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(0, 5, 8, 0.15, Math.PI - 0.15);
-  ctx.stroke();
-
-  ctx.restore();
-}
-
-/* DRAW BOSS */
-function drawBoss() {
-  if (!boss) return;
-
-  const x = boss.x;
-  const y = boss.y;
-
-  ctx.save();
-
-  ctx.fillStyle = "rgba(0,0,0,.35)";
-  ctx.beginPath();
-  ctx.ellipse(x, world.ground - 3, 55, 10, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  const armor = ctx.createLinearGradient(x - 35, 0, x + 35, 0);
-  armor.addColorStop(0, "#272c39");
-  armor.addColorStop(0.5, boss.flash > 0 ? "#ffffff" : "#9299a5");
-  armor.addColorStop(1, "#303440");
-
-  ctx.fillStyle = armor;
-  ctx.fillRect(x - 35, y - 55, 70, 95);
-
-  /* HELMET */
-  ctx.fillStyle = "#626c7c";
-  ctx.beginPath();
-  ctx.arc(x, y - 60, 31, Math.PI, 0);
-  ctx.lineTo(x + 30, y - 35);
-  ctx.lineTo(x - 30, y - 35);
-  ctx.fill();
-
-  ctx.fillStyle = "#111827";
-  ctx.fillRect(x - 20, y - 62, 40, 9);
-
-  ctx.fillStyle = "#ff553e";
-  ctx.fillRect(x - 12, y - 60, 7, 4);
-  ctx.fillRect(x + 5, y - 60, 7, 4);
-
-  /* SHIELD */
-  ctx.fillStyle = "#9a713d";
-  ctx.fillRect(x + 27, y - 25, 22, 45);
-
-  ctx.strokeStyle = "#e2bf7b";
-  ctx.strokeRect(x + 27, y - 25, 22, 45);
-
-  /* SWORD */
-  ctx.fillStyle = "#d4d9e1";
-  ctx.fillRect(x - 48, y - 22, 9, 55);
-
-  ctx.fillStyle = "#7d542c";
-  ctx.fillRect(x - 54, y + 5, 22, 6);
-
-  ctx.fillStyle = "white";
-  ctx.font = "bold 18px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText("BOSS", x, y - 105);
-
-  ctx.restore();
-}
-
-/* KEYBOARD CONTROLS */
-window.addEventListener("keydown", e => {
-  if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
-    input.left = true;
-  }
-
-  if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
-    input.right = true;
-  }
-
-  if (
-    e.key === "ArrowUp" ||
-    e.key === " " ||
-    e.key.toLowerCase() === "w"
-  ) {
-    input.jump = true;
-    e.preventDefault();
-  }
-});
-
-window.addEventListener("keyup", e => {
-  if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
-    input.left = false;
-  }
-
-  if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
-    input.right = false;
-  }
-
-  if (
-    e.key === "ArrowUp" ||
-    e.key === " " ||
-    e.key.toLowerCase() === "w"
-  ) {
-    input.jump = false;
-  }
-});
-
-window.addEventListener("blur", () => {
-  input.left = false;
-  input.right = false;
-  input.jump = false;
-});
-
-/* TOUCH CONTROLS */
-function holdButton(id, key) {
-  const button = document.getElementById(id);
-
-  button.addEventListener("pointerdown", e => {
-    e.preventDefault();
-    input[key] = true;
-
-    try {
-      button.setPointerCapture(e.pointerId);
-    } catch {}
-  });
-
-  const release = e => {
-    e.preventDefault();
-    input[key] = false;
-  };
-
-  button.addEventListener("pointerup", release);
-  button.addEventListener("pointercancel", release);
-
-  button.addEventListener("lostpointercapture", () => {
-    input[key] = false;
-  });
-}
-
-holdButton("leftButton", "left");
-holdButton("rightButton", "right");
-holdButton("jumpButton", "jump");
-
-/* SHOP */
-function openShop() {
-  gameActive = false;
-  cancelAnimationFrame(animationFrame);
-
-  document.getElementById("gameMenu").style.display = "none";
-  document.getElementById("resultScreen").style.display = "none";
-  document.getElementById("shopScreen").style.display = "flex";
-
-  updateGems();
-}
-
-function closeShop() {
-  document.getElementById("shopScreen").style.display = "none";
-
-  if (gameState === "playing") {
-    gameActive = true;
-    lastTime = performance.now();
-    animationFrame = requestAnimationFrame(gameLoop);
-  } else {
-    document.getElementById("gameMenu").style.display = "flex";
-  }
-}
-
-function buyItem(item, cost) {
-  if (!["gold", "blue", "silver"].includes(item)) return;
-
-  if (owned.includes(item)) {
-    alert("You already own this item!");
-    return;
-  }
-
-  if (gems < cost) {
-    alert("You need more gems!");
-    return;
-  }
-
-  gems -= cost;
-  owned.push(item);
-
-  try {
-    localStorage.setItem("tasOwned", JSON.stringify(owned));
-  } catch {}
-
-  applyOwnedItems();
-  updateGems();
-  drawGame();
-
-  alert("Item purchased!");
-}
-
-/* INITIALISE */
-updateGems();
-checkStatus();
-checkBan();
-
-setInterval(checkStatus, 5000);
+updateStatus();
+setInterval(updateStatus, 30000);
 </script>
 
 </body>
